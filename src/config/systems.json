@@ -1,0 +1,548 @@
+{
+  "brands": {
+    "parex": {
+      "name": "Parex",
+      "description": "Premium render systems with proven performance",
+      "systems": {
+        "scratch": {
+          "name": "Parex Scratch Render System",
+          "description": "Traditional 3-coat system for maximum durability",
+          "components": {
+            "basecoat": {
+              "name": "Parex DPM BaseCoat 25kg",
+              "shopify_handle": "parex-dpm-basecoat-25kg",
+              "price": 45.00,
+              "coverage_per_unit": 14,
+              "unit": "m²"
+            },
+            "mesh": {
+              "name": "Parex Reinforcement Mesh 50m",
+              "shopify_handle": "parex-reinforcement-mesh-50m",
+              "price": 28.00,
+              "coverage_per_unit": 50,
+              "unit": "m²"
+            },
+            "topcoat": {
+              "name": "Parex Monorex GM TopCoat 25kg",
+              "shopify_handle": "parex-monorex-gm-topcoat-25kg",
+              "price": 52.00,
+              "coverage_per_unit": 22,
+              "unit": "m²"
+            }
+          },
+          "suitable_substrates": [
+            "concrete-block",
+            "clay-brick",
+            "solid-brick",
+            "cavity-brick",
+            "pebbledash",
+            "blown-render"
+          ],
+          "performance": {
+            "durability": 9,
+            "ease_of_application": 7,
+            "cost_effectiveness": 8,
+            "weather_resistance": 9
+          }
+        },
+        "thincoat": {
+          "name": "Parex Thin Coat System",
+          "description": "Modern 2-coat system for quick application",
+          "components": {
+            "basecoat": {
+              "name": "Parex DPM BaseCoat 25kg",
+              "shopify_handle": "parex-dpm-basecoat-25kg",
+              "price": 45.00,
+              "coverage_per_unit": 14,
+              "unit": "m²"
+            },
+            "mesh": {
+              "name": "Parex Reinforcement Mesh 50m",
+              "shopify_handle": "parex-reinforcement-mesh-50m",
+              "price": 28.00,
+              "coverage_per_unit": 50,
+              "unit": "m²"
+            },
+            "topcoat": {
+              "name": "Parex Monorex TC TopCoat 25kg",
+              "shopify_handle": "parex-monorex-tc-topcoat-25kg",
+              "price": 48.00,
+              "coverage_per_unit": 18,
+              "unit": "m²"
+            }
+          },
+          "suitable_substrates": [
+            "aac-block",
+            "precast-concrete",
+            "eps-insulation",
+            "pir-insulation",
+            "rendered-masonry",
+            "smooth-render",
+            "sound-render",
+            "stained-render",
+            "algae-render"
+          ],
+          "performance": {
+            "durability": 8,
+            "ease_of_application": 9,
+            "cost_effectiveness": 9,
+            "weather_resistance": 8
+          }
+        }
+      }
+    },
+    "ecoRend": {
+      "name": "EcoRend",
+      "description": "Eco-friendly render systems with natural breathability",
+      "systems": {
+        "scratch": {
+          "name": "EcoRend Scratch System",
+          "description": "Breathable 3-coat system for heritage buildings",
+          "components": {
+            "basecoat": {
+              "name": "EcoRend BaseCoat 25kg",
+              "shopify_handle": "ecoRend-basecoat-25kg",
+              "price": 42.00,
+              "coverage_per_unit": 15,
+              "unit": "m²"
+            },
+            "mesh": {
+              "name": "EcoRend Reinforcement Mesh 50m",
+              "shopify_handle": "ecoRend-reinforcement-mesh-50m",
+              "price": 26.00,
+              "coverage_per_unit": 50,
+              "unit": "m²"
+            },
+            "topcoat": {
+              "name": "EcoRend TopCoat 25kg",
+              "shopify_handle": "ecoRend-topcoat-25kg",
+              "price": 48.00,
+              "coverage_per_unit": 20,
+              "unit": "m²"
+            }
+          },
+          "suitable_substrates": [
+            "stone-masonry",
+            "concrete-block-existing",
+            "painted-masonry",
+            "tyrolean",
+            "textured-render",
+            "cracked-render"
+          ],
+          "performance": {
+            "durability": 8,
+            "ease_of_application": 8,
+            "cost_effectiveness": 9,
+            "weather_resistance": 8
+          }
+        },
+        "thincoat": {
+          "name": "EcoRend Thin Coat System",
+          "description": "Natural thin coat system for modern applications",
+          "components": {
+            "basecoat": {
+              "name": "EcoRend BaseCoat 25kg",
+              "shopify_handle": "ecoRend-basecoat-25kg",
+              "price": 42.00,
+              "coverage_per_unit": 15,
+              "unit": "m²"
+            },
+            "mesh": {
+              "name": "EcoRend Reinforcement Mesh 50m",
+              "shopify_handle": "ecoRend-reinforcement-mesh-50m",
+              "price": 26.00,
+              "coverage_per_unit": 50,
+              "unit": "m²"
+            },
+            "topcoat": {
+              "name": "EcoRend TC TopCoat 25kg",
+              "shopify_handle": "ecoRend-tc-topcoat-25kg",
+              "price": 44.00,
+              "coverage_per_unit": 16,
+              "unit": "m²"
+            }
+          },
+          "suitable_substrates": [
+            "steel-frame",
+            "timber-frame",
+            "mineral-wool",
+            "phenolic-insulation",
+            "wood-fiber",
+            "cork-insulation",
+            "tile-hung",
+            "weatherboard"
+          ],
+          "performance": {
+            "durability": 7,
+            "ease_of_application": 9,
+            "cost_effectiveness": 8,
+            "weather_resistance": 7
+          }
+        }
+      }
+    }
+  },
+  "project_types": {
+    "new-build": {
+      "name": "New Build",
+      "description": "New construction project",
+      "substrates": [
+        {
+          "id": "concrete-block",
+          "name": "Concrete Block",
+          "description": "Standard blockwork construction"
+        },
+        {
+          "id": "aac-block",
+          "name": "AAC Block",
+          "description": "Autoclaved aerated concrete"
+        },
+        {
+          "id": "clay-brick",
+          "name": "Clay Brick",
+          "description": "Traditional clay brick construction"
+        },
+        {
+          "id": "concrete-brick",
+          "name": "Concrete Brick",
+          "description": "Precast concrete brick"
+        },
+        {
+          "id": "precast-concrete",
+          "name": "Precast Concrete",
+          "description": "Precast concrete panels"
+        },
+        {
+          "id": "insitu-concrete",
+          "name": "In-Situ Concrete",
+          "description": "Cast in place concrete"
+        },
+        {
+          "id": "steel-frame",
+          "name": "Steel Frame",
+          "description": "Steel frame with infill panels"
+        },
+        {
+          "id": "timber-frame",
+          "name": "Timber Frame",
+          "description": "Timber frame construction"
+        }
+      ]
+    },
+    "retrofit": {
+      "name": "Retrofit",
+      "description": "Existing building renovation",
+      "substrates": [
+        {
+          "id": "solid-brick",
+          "name": "Solid Brick",
+          "description": "Traditional solid brick walls"
+        },
+        {
+          "id": "cavity-brick",
+          "name": "Cavity Brick",
+          "description": "Cavity wall construction"
+        },
+        {
+          "id": "stone-masonry",
+          "name": "Stone Masonry",
+          "description": "Natural stone construction"
+        },
+        {
+          "id": "concrete-block-existing",
+          "name": "Concrete Block",
+          "description": "Existing concrete block"
+        },
+        {
+          "id": "rendered-masonry",
+          "name": "Rendered Masonry",
+          "description": "Previously rendered surfaces"
+        },
+        {
+          "id": "painted-masonry",
+          "name": "Painted Masonry",
+          "description": "Painted brick or block"
+        },
+        {
+          "id": "pebbledash",
+          "name": "Pebbledash",
+          "description": "Existing pebbledash render"
+        },
+        {
+          "id": "tyrolean",
+          "name": "Tyrolean",
+          "description": "Existing tyrolean finish"
+        },
+        {
+          "id": "smooth-render",
+          "name": "Smooth Render",
+          "description": "Existing smooth render"
+        },
+        {
+          "id": "textured-render",
+          "name": "Textured Render",
+          "description": "Existing textured render"
+        },
+        {
+          "id": "tile-hung",
+          "name": "Tile Hung",
+          "description": "Clay or concrete tile cladding"
+        },
+        {
+          "id": "weatherboard",
+          "name": "Weatherboard",
+          "description": "Timber weatherboard cladding"
+        }
+      ]
+    },
+    "ewi": {
+      "name": "External Wall Insulation",
+      "description": "Adding insulation system",
+      "substrates": [
+        {
+          "id": "eps-insulation",
+          "name": "EPS Insulation",
+          "description": "Expanded polystyrene boards"
+        },
+        {
+          "id": "mineral-wool",
+          "name": "Mineral Wool",
+          "description": "Mineral wool insulation boards"
+        },
+        {
+          "id": "pir-insulation",
+          "name": "PIR Insulation",
+          "description": "Polyisocyanurate boards"
+        },
+        {
+          "id": "phenolic-insulation",
+          "name": "Phenolic Insulation",
+          "description": "Phenolic foam boards"
+        },
+        {
+          "id": "wood-fiber",
+          "name": "Wood Fiber",
+          "description": "Natural wood fiber boards"
+        },
+        {
+          "id": "cork-insulation",
+          "name": "Cork Insulation",
+          "description": "Natural cork boards"
+        }
+      ]
+    },
+    "maintenance": {
+      "name": "Maintenance",
+      "description": "Repair, Clean, and freshen up the existing render",
+      "substrates": [
+        {
+          "id": "sound-render",
+          "name": "Sound Render",
+          "description": "Existing render in good condition"
+        },
+        {
+          "id": "cracked-render",
+          "name": "Cracked Render",
+          "description": "Render with minor cracks"
+        },
+        {
+          "id": "blown-render",
+          "name": "Blown Render",
+          "description": "Render with adhesion failure"
+        },
+        {
+          "id": "stained-render",
+          "name": "Stained Render",
+          "description": "Discolored or stained render"
+        },
+        {
+          "id": "algae-render",
+          "name": "Algae/Moss Render",
+          "description": "Biological growth on render"
+        }
+      ]
+    }
+  },
+  "beading": {
+    "scratch_render": [
+      {
+        "id": "sas-angle-15mm",
+        "name": "SAS Angle Bead 15mm",
+        "description": "Recommended for external corners",
+        "price": 3.50,
+        "length": 2.5,
+        "recommended": true
+      },
+      {
+        "id": "sas-angle-10mm",
+        "name": "SAS Angle Bead 10mm",
+        "description": "Alternative for external corners",
+        "price": 3.20,
+        "length": 2.5,
+        "recommended": false
+      },
+      {
+        "id": "sas-stop-15mm",
+        "name": "SAS Stop Bead 15mm",
+        "description": "Recommended for render termination",
+        "price": 3.80,
+        "length": 2.5,
+        "recommended": true
+      },
+      {
+        "id": "sas-stop-10mm",
+        "name": "SAS Stop Bead 10mm",
+        "description": "Alternative for render termination",
+        "price": 3.50,
+        "length": 2.5,
+        "recommended": false
+      },
+      {
+        "id": "sas-bellcast",
+        "name": "SAS Bellcast Bead",
+        "description": "For water shedding applications",
+        "price": 4.20,
+        "length": 2.5,
+        "recommended": false
+      },
+      {
+        "id": "sas-movement",
+        "name": "SAS Movement Bead",
+        "description": "For expansion joints",
+        "price": 4.50,
+        "length": 2.5,
+        "recommended": false
+      }
+    ],
+    "thin_coat": [
+      {
+        "id": "corner-mesh-premium",
+        "name": "Corner Mesh Bead Premium",
+        "description": "Premium option with integrated mesh",
+        "price": 4.80,
+        "length": 2.5,
+        "recommended": true
+      },
+      {
+        "id": "corner-mesh-6mm",
+        "name": "6mm Corner Mesh Bead",
+        "description": "Standard corner protection",
+        "price": 4.20,
+        "length": 2.5,
+        "recommended": false
+      },
+      {
+        "id": "stop-mesh",
+        "name": "Stop Mesh Bead",
+        "description": "For render termination with mesh",
+        "price": 4.50,
+        "length": 2.5,
+        "recommended": false
+      },
+      {
+        "id": "clip-drip-ledge",
+        "name": "Clip-on Drip Ledge Bead",
+        "description": "For window sills and ledges",
+        "price": 5.20,
+        "length": 2.5,
+        "recommended": false
+      }
+    ]
+  },
+  "accessories": {
+    "protection": [
+      {
+        "id": "masking-tape",
+        "name": "Professional Masking Tape 50m",
+        "price": 12.00,
+        "bundle_discount": 0.15,
+        "attachment_rate": 0.80
+      },
+      {
+        "id": "plastic-sheeting",
+        "name": "Heavy Duty Plastic Sheeting 25m",
+        "price": 18.00,
+        "bundle_discount": 0.10,
+        "attachment_rate": 0.65
+      },
+      {
+        "id": "corner-protection",
+        "name": "Corner Protection Tape 25m",
+        "price": 9.50,
+        "bundle_discount": 0.12,
+        "attachment_rate": 0.45
+      }
+    ],
+    "tools": [
+      {
+        "id": "render-float",
+        "name": "Professional Render Float",
+        "price": 24.00,
+        "bundle_discount": 0.20,
+        "attachment_rate": 0.45,
+        "system_specific": ["scratch", "thin_coat"]
+      },
+      {
+        "id": "mixing-paddle",
+        "name": "Mixing Paddle 120mm",
+        "price": 32.00,
+        "bundle_discount": 0.15,
+        "attachment_rate": 0.35,
+        "system_specific": ["scratch", "thin_coat"]
+      },
+      {
+        "id": "hawk-board",
+        "name": "Hawk Board 300mm",
+        "price": 18.00,
+        "bundle_discount": 0.18,
+        "attachment_rate": 0.40,
+        "system_specific": ["scratch"]
+      },
+      {
+        "id": "mixing-bucket",
+        "name": "Graduated Mixing Bucket 25L",
+        "price": 15.00,
+        "bundle_discount": 0.10,
+        "attachment_rate": 0.30,
+        "system_specific": ["scratch", "thin_coat"]
+      }
+    ],
+    "performance": [
+      {
+        "id": "universal-primer",
+        "name": "Universal Primer 5L",
+        "price": 28.00,
+        "bundle_discount": 0.12,
+        "attachment_rate": 0.30,
+        "system_specific": ["scratch"]
+      },
+      {
+        "id": "bonding-agent",
+        "name": "Bonding Agent 1L",
+        "price": 16.00,
+        "bundle_discount": 0.15,
+        "attachment_rate": 0.25,
+        "system_specific": ["scratch"]
+      }
+    ],
+    "finishing": [
+      {
+        "id": "texture-roller",
+        "name": "Texture Roller 18mm",
+        "price": 22.00,
+        "bundle_discount": 0.20,
+        "attachment_rate": 0.25,
+        "system_specific": ["thin_coat"]
+      },
+      {
+        "id": "edge-trowel",
+        "name": "Edge Trowel 100mm",
+        "price": 19.00,
+        "bundle_discount": 0.15,
+        "attachment_rate": 0.20,
+        "system_specific": ["scratch", "thin_coat"]
+      }
+    ]
+  }
+}
+

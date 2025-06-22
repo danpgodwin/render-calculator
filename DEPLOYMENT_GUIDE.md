@@ -4,19 +4,19 @@
 
 ### 1. Create Git Repository
 
-```bash
+\`\`\`bash
 # Create new repository on GitHub/GitLab
 # Clone to your local machine
 git clone https://github.com/yourusername/render-calculator.git
 cd render-calculator
-```
+\`\`\`
 
 ### 2. Copy Project Files
 
 Copy all files from the enhanced-render-calculator directory to your Git repository:
 
 **Essential Files:**
-```
+\`\`\`
 ├── src/
 │   ├── app/
 │   │   ├── globals.css
@@ -42,29 +42,29 @@ Copy all files from the enhanced-render-calculator directory to your Git reposit
 ├── tsconfig.json
 ├── next.config.js
 └── README.md
-```
+\`\`\`
 
 ### 3. Install Dependencies
 
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 ### 4. Test Locally
 
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 Visit `http://localhost:3000` to test the calculator.
 
 ### 5. Deploy to Vercel
 
 **Option A: Vercel CLI**
-```bash
+\`\`\`bash
 npm install -g vercel
 vercel
-```
+\`\`\`
 
 **Option B: Vercel Dashboard**
 1. Go to [vercel.com](https://vercel.com)
@@ -75,15 +75,15 @@ vercel
 
 In Vercel Dashboard → Settings → Environment Variables:
 
-```
+\`\`\`
 SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
 SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
 SHOPIFY_ADMIN_ACCESS_TOKEN=your_admin_token
-```
+\`\`\`
 
 ## 📁 Project Structure
 
-```
+\`\`\`
 render-calculator/
 ├── src/
 │   ├── app/                    # Next.js 15 App Router
@@ -101,14 +101,14 @@ render-calculator/
 ├── tailwind.config.ts          # Tailwind CSS configuration
 ├── tsconfig.json              # TypeScript configuration
 └── next.config.js             # Next.js configuration
-```
+\`\`\`
 
 ## 🔧 Managing Your Systems
 
 ### Edit `/src/config/systems.json` to:
 
 **Add New Brands:**
-```json
+\`\`\`json
 {
   "brands": {
     "k-rend": {
@@ -130,17 +130,17 @@ render-calculator/
     }
   }
 }
-```
+\`\`\`
 
 **Update Pricing:**
-```json
+\`\`\`json
 {
   "price": 52.00  // Just change the number
 }
-```
+\`\`\`
 
 **Add New Substrates:**
-```json
+\`\`\`json
 {
   "project_types": {
     "new-build": {
@@ -154,7 +154,7 @@ render-calculator/
     }
   }
 }
-```
+\`\`\`
 
 ## 🛒 Shopify Integration
 
@@ -175,11 +175,11 @@ render-calculator/
 
 Ensure `shopify_handle` in systems.json matches your Shopify product handles:
 
-```json
+\`\`\`json
 {
   "shopify_handle": "parex-dpm-basecoat-25kg"
 }
-```
+\`\`\`
 
 ### 3. Test Integration
 
@@ -234,7 +234,7 @@ The calculator will automatically:
 ## 📊 Analytics & Monitoring
 
 ### Recommended Additions:
-```bash
+\`\`\`bash
 # Google Analytics
 npm install @next/third-parties
 
@@ -243,7 +243,7 @@ npm install @sentry/nextjs
 
 # Performance Monitoring
 npm install @vercel/analytics
-```
+\`\`\`
 
 ## 🔒 Security
 
@@ -266,18 +266,18 @@ npm install @vercel/analytics
 ### Common Issues:
 
 **Build Errors:**
-```bash
+\`\`\`bash
 # Clear cache and reinstall
 rm -rf .next node_modules package-lock.json
 npm install
 npm run build
-```
+\`\`\`
 
 **Styling Issues:**
-```bash
+\`\`\`bash
 # Rebuild Tailwind
 npm run build
-```
+\`\`\`
 
 **Environment Variables:**
 - Ensure no spaces around `=`
@@ -293,7 +293,7 @@ npm run build
 - **System Management Guide**: See SYSTEM_MANAGEMENT_GUIDE.md
 
 ### Quick Commands:
-```bash
+\`\`\`bash
 # Development
 npm run dev
 
@@ -308,7 +308,7 @@ npm run type-check
 
 # Linting
 npm run lint
-```
+\`\`\`
 
 ## 🎯 Next Steps After Deployment
 
@@ -320,4 +320,3 @@ npm run lint
 6. **Set up monitoring** for errors and performance
 
 Your calculator will be live and ready for customers! 🚀
-

@@ -3,47 +3,47 @@
 ## 🚨 Latest Issues & Solutions
 
 ### Issue 1: Turbopack Configuration Deprecated
-```
+\`\`\`
 ⚠ The config property `experimental.turbo` is deprecated. Move this setting to `config.turbopack`
-```
+\`\`\`
 
 **Solution:** ✅ Fixed in updated next.config.js
 
 ### Issue 2: Missing Tailwind PostCSS Plugin
-```
+\`\`\`
 Error: Cannot find module '@tailwindcss/postcss'
-```
+\`\`\`
 
 **Solution:** ✅ Fixed - Updated to use standard PostCSS configuration
 
 ### Issue 3: React Version Conflicts
-```
+\`\`\`
 npm warn ERESOLVE overriding peer dependency
-```
+\`\`\`
 
 **Solution:**
-```bash
+\`\`\`bash
 npm install --legacy-peer-deps
-```
+\`\`\`
 
 ## 🛠️ Quick Setup Commands
 
 ### Option 1: Automated Setup (Recommended)
 
 **Linux/Mac:**
-```bash
+\`\`\`bash
 chmod +x setup.sh
 ./setup.sh
-```
+\`\`\`
 
 **Windows:**
-```cmd
+\`\`\`cmd
 setup.bat
-```
+\`\`\`
 
 ### Option 2: Manual Setup
 
-```bash
+\`\`\`bash
 # Clean install
 rm -rf node_modules package-lock.json .next
 
@@ -55,23 +55,23 @@ npm run build
 
 # Start development
 npm run dev
-```
+\`\`\`
 
 ### Option 3: Alternative Package Managers
 
 **Using Yarn (Often More Reliable):**
-```bash
+\`\`\`bash
 yarn install
 yarn build
 yarn dev
-```
+\`\`\`
 
 **Using pnpm:**
-```bash
+\`\`\`bash
 pnpm install
 pnpm build
 pnpm dev
-```
+\`\`\`
 
 ## 🔧 Configuration Fixes Applied
 
@@ -100,12 +100,12 @@ pnpm dev
 If local setup continues to fail:
 
 1. **Push to Git Repository:**
-   ```bash
+   \`\`\`bash
    git init
    git add .
    git commit -m "Initial commit"
    git push origin main
-   ```
+   \`\`\`
 
 2. **Deploy to Vercel:**
    - Import repository at [vercel.com](https://vercel.com)
@@ -113,16 +113,16 @@ If local setup continues to fail:
    - More robust than local development
 
 3. **Environment Variables in Vercel:**
-   ```
+   \`\`\`
    SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
    SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_token
    SHOPIFY_ADMIN_ACCESS_TOKEN=your_admin_token
-   ```
+   \`\`\`
 
 ## 📞 Troubleshooting Steps
 
 ### If Build Fails:
-```bash
+\`\`\`bash
 # Clear everything
 rm -rf node_modules package-lock.json .next
 
@@ -134,16 +134,16 @@ npm install --legacy-peer-deps --force
 
 # Try without build
 npm run dev
-```
+\`\`\`
 
 ### If Development Server Fails:
-```bash
+\`\`\`bash
 # Try without Turbopack
 npm run dev -- --no-turbo
 
 # Or edit package.json dev script to:
 "dev": "next dev --no-turbo"
-```
+\`\`\`
 
 ### Check System Requirements:
 - ✅ Node.js 18.0.0+ (recommended: 18.17.0 or 20.x)
@@ -153,17 +153,17 @@ npm run dev -- --no-turbo
 ## ✅ Success Indicators
 
 When everything works:
-```
+\`\`\`
 ✅ Installation successful!
 ✅ Build successful!
 🎯 Ready to start development server
-```
+\`\`\`
 
 Then:
-```bash
+\`\`\`bash
 npm run dev
 # Visit http://localhost:3000
-```
+\`\`\`
 
 ## 🆘 Emergency Fallback
 
@@ -190,4 +190,3 @@ The calculator is designed to work perfectly in production environments even if 
 **Setup scripts:**
 - `setup.sh` / `setup.bat` - Automated installation
 - Handles cleaning, installation, and build testing
-

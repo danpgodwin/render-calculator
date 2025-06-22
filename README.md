@@ -1,325 +1,114 @@
-# Enhanced Render System Calculator
+# Render Calculator
 
-A modern, intelligent calculator for render systems with real-time recommendations, pricing, and Shopify integration.
+An intelligent render system calculator built with Next.js 15, providing real-time recommendations and pricing for render systems.
 
-![Render Calculator](https://img.shields.io/badge/Next.js-15.3.4-black?style=for-the-badge&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?style=for-the-badge&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0.0-38B2AC?style=for-the-badge&logo=tailwind-css)
+## 🚀 Quick Deploy to Vercel
 
-## 🚀 Features
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/render-calculator)
 
-- **🧠 Intelligent System Recommendations** - Automatically selects the best render system based on substrate compatibility and performance metrics
-- **💰 Real-time Cost Calculations** - Instant pricing with quantity calculations and coverage estimates
-- **✅ Smart Validation** - Required field validation with helpful error messages
-- **📱 Mobile Responsive** - Optimized for all devices with touch-friendly interface
-- **🛒 Shopify Integration** - Direct integration with your Shopify store for real-time pricing and cart functionality
-- **⚙️ Configuration Management** - JSON-based system for easy product and pricing management
-- **🎨 Modern UI** - Clean, professional design with progress tracking
+## ✨ Features
 
-## 🏗️ Built With
+- **Intelligent System Recommendations** - AI-powered system selection based on substrate compatibility
+- **Real-time Cost Calculations** - Automatic quantity and pricing calculations
+- **Mobile Responsive Design** - Works perfectly on all devices
+- **Shopify Integration Ready** - Connect to your Shopify store for live pricing
+- **Easy Configuration** - Manage all products via JSON configuration
 
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Beautiful icons
-- **Vercel** - Deployment platform
-
-## 🚀 Quick Start
+## 🛠️ Local Development
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm or yarn
-- Git
+- Node.js 18.0.0 or later
+- npm, yarn, or pnpm
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
+1. **Clone the repository:**
+   \`\`\`bash
    git clone https://github.com/yourusername/render-calculator.git
    cd render-calculator
-   ```
+   \`\`\`
 
-2. **Install dependencies**
-   ```bash
+2. **Install dependencies:**
+   \`\`\`bash
    npm install
-   ```
+   # or
+   yarn install
+   # or
+   pnpm install
+   \`\`\`
 
-3. **Run development server**
-   ```bash
+3. **Run the development server:**
+   \`\`\`bash
    npm run dev
-   ```
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   \`\`\`
 
-4. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
+4. **Open your browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 🔧 Configuration
+## 🌐 Deployment
 
-### System Management
+### Deploy to Vercel (Recommended)
 
-All render systems, pricing, and product data are managed through `/src/config/systems.json`:
+1. **Push to Git:**
+   \`\`\`bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   \`\`\`
 
-```json
-{
-  "brands": {
-    "parex": {
-      "name": "Parex",
-      "systems": {
-        "scratch": {
-          "name": "Parex Scratch Render System",
-          "components": {
-            "basecoat": {
-              "name": "Parex DPM BaseCoat 25kg",
-              "price": 45.00,
-              "coverage_per_unit": 14
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
+2. **Deploy to Vercel:**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your Git repository
+   - Deploy automatically
 
-### Environment Variables
+3. **Environment Variables (Optional - for Shopify integration):**
+   \`\`\`
+   SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
+   SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
+   SHOPIFY_ADMIN_ACCESS_TOKEN=your_admin_token
+   \`\`\`
 
-Create `.env.local` for Shopify integration:
+## 📊 Managing Your Products
 
-```env
-SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
-SHOPIFY_ADMIN_ACCESS_TOKEN=your_admin_token
-```
+Edit `/src/config/systems.json` to:
 
-## 📊 How It Works
+- Add new render systems
+- Update pricing
+- Add new substrates
+- Configure recommendations
 
-### 1. Project Selection
-Users select their project type (New Build, Retrofit, EWI, Maintenance)
+See `SYSTEM_MANAGEMENT_GUIDE.md` for detailed instructions.
 
-### 2. Substrate & Area
-Dynamic substrate options based on project type, with required area input
+## 📱 Tech Stack
 
-### 3. Intelligent Recommendations
-Algorithm selects best system based on:
-- Substrate compatibility
-- Performance scores (durability, ease, cost, weather resistance)
-- Coverage requirements
+- **Framework:** Next.js 15 with App Router
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI
+- **TypeScript:** Full type safety
+- **Deployment:** Optimized for Vercel
 
-### 4. Cost Calculation
-Automatic calculation of:
-- Component quantities
-- Individual pricing
-- Total system cost
-- Cost per m²
+## 🎯 Performance
 
-## 🛒 Shopify Integration
-
-### Product Mapping
-Each component includes a `shopify_handle` that maps to your Shopify products:
-
-```json
-{
-  "shopify_handle": "parex-dpm-basecoat-25kg"
-}
-```
-
-### Features
-- Real-time pricing from Shopify
-- Stock level checking
-- Direct add-to-cart functionality
-- Product image integration
-
-## 📱 Responsive Design
-
-- **Mobile First** - Optimized for mobile devices
-- **Touch Friendly** - Large touch targets and intuitive gestures
-- **Progressive Enhancement** - Works on all devices and browsers
-- **Accessibility** - WCAG compliant with keyboard navigation
-
-## 🔄 Adding New Systems
-
-### 1. Add Brand
-```json
-{
-  "brands": {
-    "k-rend": {
-      "name": "K-Rend",
-      "description": "Silicone render systems"
-    }
-  }
-}
-```
-
-### 2. Add System
-```json
-{
-  "systems": {
-    "hp12": {
-      "name": "K-Rend HP12 System",
-      "suitable_substrates": ["eps-insulation"],
-      "performance": {
-        "durability": 9,
-        "ease_of_application": 8,
-        "cost_effectiveness": 7,
-        "weather_resistance": 10
-      }
-    }
-  }
-}
-```
-
-### 3. Add Components
-```json
-{
-  "components": {
-    "basecoat": {
-      "name": "K-Rend HP12 BaseCoat",
-      "shopify_handle": "k-rend-hp12-basecoat",
-      "price": 48.00,
-      "coverage_per_unit": 12
-    }
-  }
-}
-```
-
-## 📈 Performance
-
-- **Lighthouse Score**: 95+ across all metrics
-- **Core Web Vitals**: Optimized for Google's performance standards
-- **Bundle Size**: Optimized with code splitting and tree shaking
-- **Loading Speed**: Sub-second initial load times
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. **Connect Repository**
-   - Import project in Vercel dashboard
-   - Connect your Git repository
-
-2. **Configure Environment Variables**
-   - Add Shopify credentials in Vercel settings
-
-3. **Deploy**
-   - Automatic deployment on every push
-   - Preview deployments for pull requests
-
-### Manual Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-## 🧪 Testing
-
-```bash
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
-
-# Build test
-npm run build
-```
-
-## 📁 Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── globals.css         # Global styles
-│   ├── layout.tsx          # Root layout
-│   └── page.tsx            # Home page
-├── components/
-│   ├── ui/                 # Reusable UI components
-│   └── Calculator.tsx      # Main calculator
-├── config/
-│   └── systems.json        # System configuration
-└── lib/
-    └── utils.ts            # Utility functions
-```
-
-## 🔧 Customization
-
-### Styling
-- Modify `tailwind.config.ts` for theme customization
-- Update CSS variables in `globals.css`
-- Component-level styling in individual files
-
-### Functionality
-- Add new steps in `Calculator.tsx`
-- Extend system logic in configuration
-- Add new UI components in `components/ui/`
-
-## 📊 Analytics
-
-### Recommended Integrations
-- **Google Analytics 4** - User behavior tracking
-- **Vercel Analytics** - Performance monitoring
-- **Sentry** - Error tracking
-- **Hotjar** - User experience insights
-
-## 🔒 Security
-
-- **HTTPS by default** on Vercel
-- **Environment variable protection**
-- **XSS protection** via React
-- **Input validation** on all user inputs
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-**Build Errors**
-```bash
-rm -rf .next node_modules
-npm install
-npm run build
-```
-
-**Styling Issues**
-- Check Tailwind configuration
-- Verify CSS variable definitions
-- Clear browser cache
-
-**API Integration**
-- Verify environment variables
-- Check Shopify API permissions
-- Test API endpoints
+- **Lighthouse Score:** 95+ on all metrics
+- **Core Web Vitals:** Excellent ratings
+- **Mobile Optimized:** Perfect mobile experience
+- **SEO Ready:** Optimized meta tags and structure
 
 ## 📞 Support
 
-- **Documentation**: See `DEPLOYMENT_GUIDE.md` and `SYSTEM_MANAGEMENT_GUIDE.md`
-- **Issues**: Create GitHub issues for bugs
-- **Features**: Submit feature requests via GitHub
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+- **Documentation:** See guides in the project root
+- **Issues:** Create GitHub issues for bugs
+- **Features:** Submit feature requests via GitHub
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Render Systems Online** - Product expertise and requirements
-- **Next.js Team** - Amazing React framework
-- **Vercel** - Excellent deployment platform
-- **Tailwind CSS** - Beautiful utility-first CSS
+This project is licensed under the MIT License.
 
 ---
 
-**Built with ❤️ for the construction industry**
-
+**Built with ❤️ for Render Systems Online**

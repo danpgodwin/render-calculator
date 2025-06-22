@@ -10,7 +10,7 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
 
 ### 1. Brands and Systems
 
-```json
+\`\`\`json
 {
   "brands": {
     "parex": {
@@ -41,11 +41,11 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
     }
   }
 }
-```
+\`\`\`
 
 ### 2. Project Types and Substrates
 
-```json
+\`\`\`json
 {
   "project_types": {
     "new-build": {
@@ -61,11 +61,11 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
     }
   }
 }
-```
+\`\`\`
 
 ### 3. Beading Options
 
-```json
+\`\`\`json
 {
   "beading": {
     "scratch_render": [
@@ -80,11 +80,11 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
     ]
   }
 }
-```
+\`\`\`
 
 ### 4. Accessories and Upselling
 
-```json
+\`\`\`json
 {
   "accessories": {
     "protection": [
@@ -98,13 +98,13 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
     ]
   }
 }
-```
+\`\`\`
 
 ## How to Add New Systems
 
 ### Step 1: Add a New Brand
 
-```json
+\`\`\`json
 {
   "brands": {
     "your-new-brand": {
@@ -116,11 +116,11 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
     }
   }
 }
-```
+\`\`\`
 
 ### Step 2: Add Systems to the Brand
 
-```json
+\`\`\`json
 {
   "systems": {
     "your-system-type": {
@@ -151,7 +151,7 @@ The main configuration is stored in `/src/config/systems.json`. This file contai
     }
   }
 }
-```
+\`\`\`
 
 ## How the Recommendation Engine Works
 
@@ -175,7 +175,7 @@ Each system has four performance metrics (scale 1-10):
 
 Update the `price` field in any component:
 
-```json
+\`\`\`json
 {
   "basecoat": {
     "name": "Parex DPM BaseCoat 25kg",
@@ -183,7 +183,7 @@ Update the `price` field in any component:
     "coverage_per_unit": 14
   }
 }
-```
+\`\`\`
 
 ### Bulk Price Updates
 
@@ -194,7 +194,7 @@ For bulk updates, you can:
 
 ## How to Add New Project Types
 
-```json
+\`\`\`json
 {
   "project_types": {
     "your-new-type": {
@@ -210,27 +210,27 @@ For bulk updates, you can:
     }
   }
 }
-```
+\`\`\`
 
 ## How to Add New Substrates
 
 1. Add the substrate to the appropriate project type(s)
 2. Add the substrate ID to relevant systems' `suitable_substrates` arrays
 
-```json
+\`\`\`json
 {
   "suitable_substrates": [
     "existing-substrate",
     "your-new-substrate-id"
   ]
 }
-```
+\`\`\`
 
 ## How to Modify Beading Options
 
 ### For Scratch Render Systems
 
-```json
+\`\`\`json
 {
   "beading": {
     "scratch_render": [
@@ -245,11 +245,11 @@ For bulk updates, you can:
     ]
   }
 }
-```
+\`\`\`
 
 ### For Thin Coat Systems
 
-```json
+\`\`\`json
 {
   "beading": {
     "thin_coat": [
@@ -257,13 +257,13 @@ For bulk updates, you can:
     ]
   }
 }
-```
+\`\`\`
 
 ## How to Update Accessories
 
 ### Adding New Accessories
 
-```json
+\`\`\`json
 {
   "accessories": {
     "your-category": [
@@ -278,7 +278,7 @@ For bulk updates, you can:
     ]
   }
 }
-```
+\`\`\`
 
 ### Accessory Categories
 
@@ -293,11 +293,11 @@ For bulk updates, you can:
 
 Each component has a `shopify_handle` field that should match your Shopify product handle:
 
-```json
+\`\`\`json
 {
   "shopify_handle": "parex-dpm-basecoat-25kg"
 }
-```
+\`\`\`
 
 This allows the calculator to:
 - Fetch real-time pricing from Shopify
@@ -315,12 +315,12 @@ This allows the calculator to:
 
 The calculator automatically calculates quantities based on coverage:
 
-```json
+\`\`\`json
 {
   "coverage_per_unit": 14,  // m² covered per unit
   "unit": "m²"              // Unit of measurement
 }
-```
+\`\`\`
 
 **Formula**: `Quantity = Math.ceil(Area ÷ Coverage per Unit)`
 
@@ -336,9 +336,9 @@ The calculator automatically calculates quantities based on coverage:
 
 Always backup your `systems.json` file before making changes:
 
-```bash
+\`\`\`bash
 cp src/config/systems.json src/config/systems.json.backup
-```
+\`\`\`
 
 Consider using version control to track changes over time.
 
@@ -346,7 +346,7 @@ Consider using version control to track changes over time.
 
 ### Adding a New K-Rend System
 
-```json
+\`\`\`json
 {
   "brands": {
     "k-rend": {
@@ -377,7 +377,7 @@ Consider using version control to track changes over time.
     }
   }
 }
-```
+\`\`\`
 
 ### Updating All Parex Prices by 5%
 
@@ -387,7 +387,7 @@ Consider using version control to track changes over time.
 
 ### Adding a New Accessory Category
 
-```json
+\`\`\`json
 {
   "accessories": {
     "safety": [
@@ -402,7 +402,7 @@ Consider using version control to track changes over time.
     ]
   }
 }
-```
+\`\`\`
 
 ## Future Enhancements
 
@@ -424,4 +424,3 @@ For technical support with the calculator system:
 4. Contact your development team for code-level changes
 
 Remember: This system allows you to manage 90% of calculator changes without touching any code!
-

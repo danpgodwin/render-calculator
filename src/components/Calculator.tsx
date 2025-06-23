@@ -9,13 +9,16 @@ export default function Calculator() {
     projectType: null as string | null,
     substrate: null as string | null,
     area: "",
+    selectedSystem: null as any,
     beading: [] as any[],
     accessories: [] as any[],
     color: null as string | null,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [recommendation, setRecommendation] = useState<any>(null)
+  const [availableSystems, setAvailableSystems] = useState<any[]>([])
   const [cart, setCart] = useState<any[]>([])
+  const [shopifyPrices, setShopifyPrices] = useState<Record<string, any>>({})
+  const [colorVariants, setColorVariants] = useState<any[]>([])
 
   const steps = [
     "Project Details",
@@ -28,6 +31,49 @@ export default function Calculator() {
   ]
 
   const progress = ((currentStep + 1) / steps.length) * 100
+
+  // Fetch Shopify prices
+  const fetchShopifyPrices = async (handles: string[]) => {
+    // This would connect to your Shopify API
+    // For now, we'll use the JSON prices as fallback
+    const prices: Record<string, any> = {}
+
+    // Simulate API call - replace with actual Shopify integration
+    handles.forEach((handle) => {
+      prices[handle] = {
+        price: null, // Will use JSON price as fallback
+        variants: [],
+      }
+    })
+
+    setShopifyPrices(prices)
+  }
+
+  const getPrice = (handle: string, variantId?: string) => {
+    // Check Shopify price first, fallback to JSON
+    const shopifyProduct = shopifyPrices[handle]
+    if (shopifyProduct?.price) {
+      if (variantId && shopifyProduct.variants) {
+        const variant = shopifyProduct.variants.find((v: any) => v.id === variantId)
+        return variant?.price || shopifyProduct.price
+      }
+      return shopifyProduct.price
+    }
+
+    // Fallback to JSON prices
+    const brands = systemsConfig.brands as any
+    for (const brand of Object.values(brands)) {
+      for (const system of Object.values(brand.systems)) {
+        for (const component of Object.values(system.components)) {
+          if (component.shopify_handle === handle) {
+            return component.price
+          }
+        }
+      }
+    }
+
+    return 0
+  }
 
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {}
@@ -45,16 +91,17 @@ export default function Calculator() {
       }
     }
 
-    // Steps 3-6 are optional, no validation needed
+    if (step === 2 && !selections.selectedSystem) {
+      newErrors.selectedSystem = "Please select a system to proceed"
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const findBestSystem = (projectType: string, substrate: string) => {
-    const brands = systemsConfig.brands
-    let bestMatch = null
-    let bestScore = 0
+  const findCompatibleSystems = (projectType: string, substrate: string) => {
+    const brands = systemsConfig.brands as any
+    const compatibleSystems: any[] = []
 
     Object.entries(brands).forEach(([brandKey, brand]: [string, any]) => {
       Object.entries(brand.systems).forEach(([systemKey, system]: [string, any]) => {
@@ -65,37 +112,42 @@ export default function Calculator() {
             system.performance.cost_effectiveness +
             system.performance.weather_resistance
 
-          if (score > bestScore) {
-            bestScore = score
-            bestMatch = {
-              brand: brandKey,
-              brandName: brand.name,
-              system: systemKey,
-              systemData: system,
-              systemType: systemKey,
-              score: score,
-            }
-          }
+          compatibleSystems.push({
+            brandKey,
+            brandName: brand.name,
+            systemKey,
+            systemData: system,
+            score,
+            isRecommended: false, // Will be set for highest scoring system
+          })
         }
       })
     })
 
-    return bestMatch
+    // Sort by score and mark the highest as recommended
+    compatibleSystems.sort((a, b) => b.score - a.score)
+    if (compatibleSystems.length > 0) {
+      compatibleSystems[0].isRecommended = true
+    }
+
+    return compatibleSystems
   }
 
-  const calculateQuantities = (systemData: any, area: string) => {
+  const calculateSystemCost = (systemData: any, area: string) => {
     const areaNum = Number.parseFloat(area)
     const components: any[] = []
     let totalCost = 0
 
     Object.entries(systemData.components).forEach(([componentKey, component]: [string, any]) => {
       const quantity = Math.ceil(areaNum / component.coverage_per_unit)
-      const totalPrice = quantity * component.price
+      const price = getPrice(component.shopify_handle)
+      const totalPrice = quantity * price
       totalCost += totalPrice
 
       components.push({
         ...component,
         quantity,
+        price,
         totalPrice,
         componentType: componentKey,
       })
@@ -104,142 +156,107 @@ export default function Calculator() {
     return { components, totalCost }
   }
 
-  const generateRecommendation = () => {
+  const generateSystemRecommendations = () => {
     const { projectType, substrate, area } = selections
     if (!projectType || !substrate) return
 
-    const bestSystem = findBestSystem(projectType, substrate)
+    const systems = findCompatibleSystems(projectType, substrate)
 
-    if (!bestSystem) return
-
-    const { components, totalCost } = calculateQuantities(bestSystem.systemData, area)
-
-    setRecommendation({
-      brand: bestSystem.brandName,
-      system: bestSystem.systemData.name,
-      description: bestSystem.systemData.description,
-      components,
-      totalCost,
-      area: Number.parseFloat(area),
-      performance: bestSystem.systemData.performance,
-      systemType: bestSystem.systemType,
+    // Calculate costs for each system
+    const systemsWithCosts = systems.map((system) => {
+      const { components, totalCost } = calculateSystemCost(system.systemData, area)
+      return {
+        ...system,
+        components,
+        totalCost,
+        area: Number.parseFloat(area),
+      }
     })
+
+    setAvailableSystems(systemsWithCosts)
+
+    // Fetch Shopify prices for all components
+    const allHandles = systemsWithCosts.flatMap((system) => system.components.map((comp: any) => comp.shopify_handle))
+    fetchShopifyPrices(allHandles)
+  }
+
+  const selectSystem = (system: any) => {
+    setSelections((prev) => ({ ...prev, selectedSystem: system }))
+
+    // Fetch color variants for the topcoat
+    const topcoat = system.components.find((comp: any) => comp.componentType === "topcoat")
+    if (topcoat) {
+      fetchColorVariants(topcoat.shopify_handle)
+    }
+  }
+
+  const fetchColorVariants = async (handle: string) => {
+    // This would fetch from Shopify API
+    // For now, simulate with default colors
+    const defaultColors = [
+      { id: "white", name: "Pure White", hex: "#FFFFFF", price_adjustment: 0 },
+      { id: "cream", name: "Cream", hex: "#F5F5DC", price_adjustment: 0 },
+      { id: "light-grey", name: "Light Grey", hex: "#D3D3D3", price_adjustment: 0 },
+      { id: "dark-grey", name: "Dark Grey", hex: "#696969", price_adjustment: 5 },
+      { id: "beige", name: "Beige", hex: "#F5F5DC", price_adjustment: 0 },
+      { id: "sandstone", name: "Sandstone", hex: "#FAD5A5", price_adjustment: 3 },
+    ]
+
+    setColorVariants(defaultColors)
   }
 
   const getBeadingOptions = () => {
-    if (!recommendation) return []
-    const systemType = recommendation.systemType === "scratch" ? "scratch_render" : "thin_coat"
+    if (!selections.selectedSystem) return []
+    const systemType = selections.selectedSystem.systemKey === "scratch" ? "scratch_render" : "thin_coat"
     return (systemsConfig.beading as any)[systemType] || []
   }
 
   const getAccessoryOptions = () => {
     const accessories = systemsConfig.accessories as any
-    const allAccessories: any[] = []
+    const categorizedAccessories: Record<string, any[]> = {}
 
     Object.entries(accessories).forEach(([category, items]: [string, any]) => {
-      items.forEach((item: any) => {
-        allAccessories.push({
-          ...item,
-          category: category.charAt(0).toUpperCase() + category.slice(1),
-        })
-      })
-    })
-
-    return allAccessories
-  }
-
-  const calculateBeadingQuantity = (beadItem: any) => {
-    const area = Number.parseFloat(selections.area)
-    // Estimate: roughly 1 linear meter of beading per 3m² of area
-    const estimatedLinearMeters = Math.ceil(area / 3)
-    return Math.ceil(estimatedLinearMeters / beadItem.length)
-  }
-
-  const calculateTotalCost = () => {
-    let total = recommendation?.totalCost || 0
-
-    // Add beading costs
-    selections.beading.forEach((bead) => {
-      total += bead.totalPrice
-    })
-
-    // Add accessory costs
-    selections.accessories.forEach((accessory) => {
-      const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
-      total += discountedPrice
-    })
-
-    return total
-  }
-
-  const addToCart = () => {
-    const cartItem = {
-      id: Date.now(),
-      recommendation,
-      beading: selections.beading,
-      accessories: selections.accessories,
-      color: selections.color,
-      totalCost: calculateTotalCost(),
-      area: selections.area,
-      projectType: selections.projectType,
-      substrate: selections.substrate,
-    }
-
-    setCart([...cart, cartItem])
-
-    // Reset for new calculation
-    setSelections({
-      projectType: null,
-      substrate: null,
-      area: "",
-      beading: [],
-      accessories: [],
-      color: null,
-    })
-    setRecommendation(null)
-    setCurrentStep(0)
-  }
-
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      if (currentStep === 1) {
-        generateRecommendation()
-      }
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      }
-    }
-  }
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-    }
-  }
-
-  const getSubstrateOptions = () => {
-    const projectTypes = systemsConfig.project_types as any
-    return projectTypes[selections.projectType as string]?.substrates || []
-  }
-
-  const toggleBeading = (beadItem: any) => {
-    const quantity = calculateBeadingQuantity(beadItem)
-    const totalPrice = quantity * beadItem.price
-    const beadWithQuantity = { ...beadItem, quantity, totalPrice }
-
-    const isSelected = selections.beading.some((b) => b.id === beadItem.id)
-
-    if (isSelected) {
-      setSelections((prev) => ({
-        ...prev,
-        beading: prev.beading.filter((b) => b.id !== beadItem.id),
+      const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
+      categorizedAccessories[categoryName] = items.map((item: any) => ({
+        ...item,
+        price: getPrice(item.shopify_handle || `${item.id}-handle`),
       }))
-    } else {
-      setSelections((prev) => ({
-        ...prev,
-        beading: [...prev.beading, beadWithQuantity],
-      }))
+    })
+
+    return categorizedAccessories
+  }
+
+  const updateBeadingQuantity = (beadId: string, quantity: number) => {
+    setSelections((prev) => ({
+      ...prev,
+      beading: prev.beading.map((bead) =>
+        bead.id === beadId
+          ? { ...bead, quantity, totalPrice: quantity * getPrice(bead.shopify_handle || `${bead.id}-handle`) }
+          : bead,
+      ),
+    }))
+  }
+
+  const addBeading = (beadItem: any) => {
+    const price = getPrice(beadItem.shopify_handle || `${beadItem.id}-handle`)
+    const beadWithQuantity = {
+      ...beadItem,
+      quantity: 1,
+      price,
+      totalPrice: price,
     }
+
+    setSelections((prev) => ({
+      ...prev,
+      beading: [...prev.beading, beadWithQuantity],
+    }))
+  }
+
+  const removeBeading = (beadId: string) => {
+    setSelections((prev) => ({
+      ...prev,
+      beading: prev.beading.filter((b) => b.id !== beadId),
+    }))
   }
 
   const toggleAccessory = (accessoryItem: any) => {
@@ -258,18 +275,89 @@ export default function Calculator() {
     }
   }
 
-  const colors = [
-    { id: "white", name: "Pure White", hex: "#FFFFFF" },
-    { id: "cream", name: "Cream", hex: "#F5F5DC" },
-    { id: "light-grey", name: "Light Grey", hex: "#D3D3D3" },
-    { id: "dark-grey", name: "Dark Grey", hex: "#696969" },
-    { id: "beige", name: "Beige", hex: "#F5F5DC" },
-    { id: "sandstone", name: "Sandstone", hex: "#FAD5A5" },
-  ]
+  const calculateTotalCost = () => {
+    let total = selections.selectedSystem?.totalCost || 0
+
+    // Add beading costs
+    selections.beading.forEach((bead) => {
+      total += bead.totalPrice
+    })
+
+    // Add accessory costs
+    selections.accessories.forEach((accessory) => {
+      const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
+      total += discountedPrice
+    })
+
+    // Add color price adjustment
+    if (selections.color) {
+      const colorVariant = colorVariants.find((c) => c.id === selections.color)
+      if (colorVariant?.price_adjustment) {
+        const topcoat = selections.selectedSystem?.components.find((comp: any) => comp.componentType === "topcoat")
+        if (topcoat) {
+          total += topcoat.quantity * colorVariant.price_adjustment
+        }
+      }
+    }
+
+    return total
+  }
+
+  const addToCart = () => {
+    const cartItem = {
+      id: Date.now(),
+      selectedSystem: selections.selectedSystem,
+      beading: selections.beading,
+      accessories: selections.accessories,
+      color: selections.color,
+      totalCost: calculateTotalCost(),
+      area: selections.area,
+      projectType: selections.projectType,
+      substrate: selections.substrate,
+    }
+
+    setCart([...cart, cartItem])
+
+    // Reset for new calculation
+    setSelections({
+      projectType: null,
+      substrate: null,
+      area: "",
+      selectedSystem: null,
+      beading: [],
+      accessories: [],
+      color: null,
+    })
+    setAvailableSystems([])
+    setColorVariants([])
+    setCurrentStep(0)
+  }
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      if (currentStep === 1) {
+        generateSystemRecommendations()
+      }
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1)
+      }
+    }
+  }
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const getSubstrateOptions = () => {
+    const projectTypes = systemsConfig.project_types as any
+    return projectTypes[selections.projectType as string]?.substrates || []
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
           <div>
@@ -413,54 +501,100 @@ export default function Calculator() {
                 )}
 
                 {/* Step 2: System Recommendations */}
-                {currentStep === 2 && recommendation && (
-                  <div className="space-y-8">
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-green-600 text-xl">✓</span>
-                        <h3 className="font-semibold text-green-800">Recommended System</h3>
-                      </div>
-                      <h4 className="text-lg font-bold text-gray-900 mb-1">{recommendation.system}</h4>
-                      <p className="text-sm text-gray-600 mb-2">{recommendation.description}</p>
-                      <p className="text-sm text-green-800">
-                        <strong>Brand:</strong> {recommendation.brand}
+                {currentStep === 2 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Available Systems</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Based on your substrate selection, here are the compatible render systems. Our recommended
+                        system is highlighted.
                       </p>
+                      {errors.selectedSystem && <p className="text-sm text-red-600 mb-4">{errors.selectedSystem}</p>}
                     </div>
 
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-4">System Components</h4>
-                      <div className="space-y-3">
-                        {recommendation.components.map((component: any, index: number) => (
-                          <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div className="space-y-4">
+                      {availableSystems.map((system, index) => (
+                        <div
+                          key={index}
+                          onClick={() => selectSystem(system)}
+                          className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                            selections.selectedSystem?.systemKey === system.systemKey
+                              ? "border-blue-600 bg-blue-50"
+                              : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
+                          } ${system.isRecommended ? "ring-2 ring-green-200" : ""}`}
+                        >
+                          <div className="flex justify-between items-start mb-4">
                             <div className="flex-1">
-                              <h5 className="font-medium text-gray-900 mb-1">{component.name}</h5>
-                              <p className="text-sm text-gray-600">
-                                Quantity: {component.quantity} × £{component.price.toFixed(2)}
+                              <div className="flex items-center gap-3 mb-2">
+                                <h4 className="text-lg font-bold text-gray-900">{system.systemData.name}</h4>
+                                {system.isRecommended && (
+                                  <span className="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">
+                                    ⭐ Recommended
+                                  </span>
+                                )}
+                                {selections.selectedSystem?.systemKey === system.systemKey && (
+                                  <span className="text-blue-600 text-xl">✓</span>
+                                )}
+                              </div>
+                              <p className="text-gray-600 mb-3">{system.systemData.description}</p>
+                              <p className="text-sm text-gray-700 mb-3">
+                                <strong>Brand:</strong> {system.brandName}
                               </p>
+
+                              {/* Performance Metrics */}
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                <div className="text-center">
+                                  <div className="text-lg font-bold text-blue-600">
+                                    {system.systemData.performance.durability}/10
+                                  </div>
+                                  <div className="text-xs text-gray-600">Durability</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-lg font-bold text-green-600">
+                                    {system.systemData.performance.ease_of_application}/10
+                                  </div>
+                                  <div className="text-xs text-gray-600">Ease of Use</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-lg font-bold text-purple-600">
+                                    {system.systemData.performance.cost_effectiveness}/10
+                                  </div>
+                                  <div className="text-xs text-gray-600">Value</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-lg font-bold text-orange-600">
+                                    {system.systemData.performance.weather_resistance}/10
+                                  </div>
+                                  <div className="text-xs text-gray-600">Weather</div>
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-semibold text-gray-900">£{component.totalPrice.toFixed(2)}</p>
+
+                            <div className="text-right ml-6">
+                              <div className="text-2xl font-bold text-gray-900">£{system.totalCost.toFixed(2)}</div>
+                              <div className="text-sm text-gray-600">
+                                £{(system.totalCost / system.area).toFixed(2)}/m²
+                              </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h4 className="font-semibold text-blue-900 mb-1">System Cost</h4>
-                          <p className="text-sm text-blue-800">For {recommendation.area}m² coverage</p>
+                          {/* System Components */}
+                          <div className="border-t border-gray-200 pt-4">
+                            <h5 className="font-medium text-gray-900 mb-3">System Components:</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              {system.components.map((component: any, compIndex: number) => (
+                                <div key={compIndex} className="bg-gray-50 p-3 rounded">
+                                  <div className="font-medium text-sm text-gray-900 mb-1">{component.name}</div>
+                                  <div className="text-xs text-gray-600">
+                                    Qty: {component.quantity} × £{component.price.toFixed(2)} = £
+                                    {component.totalPrice.toFixed(2)}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-3xl font-bold text-blue-900 mb-1">
-                            £{recommendation.totalCost.toFixed(2)}
-                          </p>
-                          <p className="text-sm text-blue-800">
-                            £{(recommendation.totalCost / recommendation.area).toFixed(2)}/m²
-                          </p>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -471,64 +605,106 @@ export default function Calculator() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Select Beading (Optional)</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Choose beading options to protect edges and corners. Quantities are automatically calculated
-                        based on your area.
+                        Add beading to protect edges and corners. Specify the exact quantities you need.
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {getBeadingOptions().map((bead: any) => {
-                        const isSelected = selections.beading.some((b) => b.id === bead.id)
-                        const quantity = calculateBeadingQuantity(bead)
-                        const totalPrice = quantity * bead.price
+                    {/* Available Beading */}
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">Available Beading Options</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {getBeadingOptions().map((bead: any) => {
+                          const isAdded = selections.beading.some((b) => b.id === bead.id)
+                          const price = getPrice(bead.shopify_handle || `${bead.id}-handle`)
 
-                        return (
-                          <div
-                            key={bead.id}
-                            onClick={() => toggleBeading(bead)}
-                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                              isSelected
-                                ? "border-blue-600 bg-blue-50"
-                                : "border-gray-200 bg-white hover:border-gray-300"
-                            } ${bead.recommended ? "ring-2 ring-green-200" : ""}`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-medium text-gray-900">{bead.name}</h4>
-                                  {bead.recommended && (
-                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                      Recommended
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm text-gray-600 mb-2">{bead.description}</p>
-                                <div className="text-sm text-gray-700">
-                                  <p>
-                                    Quantity needed: {quantity} × £{bead.price.toFixed(2)}
+                          return (
+                            <div
+                              key={bead.id}
+                              className={`p-4 border-2 rounded-lg ${
+                                bead.recommended ? "border-green-200 bg-green-50" : "border-gray-200 bg-white"
+                              }`}
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h5 className="font-medium text-gray-900">{bead.name}</h5>
+                                    {bead.recommended && (
+                                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                        Recommended
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-600 mb-2">{bead.description}</p>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    £{price.toFixed(2)} per {bead.length}m length
                                   </p>
-                                  <p className="font-medium">Total: £{totalPrice.toFixed(2)}</p>
                                 </div>
                               </div>
-                              {isSelected && <div className="text-blue-600 text-xl ml-2">✓</div>}
+
+                              {!isAdded ? (
+                                <button
+                                  onClick={() => addBeading(bead)}
+                                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                                >
+                                  Add to Selection
+                                </button>
+                              ) : (
+                                <div className="text-center text-sm text-green-600 font-medium">
+                                  ✓ Added to selection
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+                      </div>
                     </div>
 
+                    {/* Selected Beading */}
                     {selections.beading.length > 0 && (
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 mb-2">Selected Beading</h4>
-                        <div className="space-y-2">
+                        <h4 className="font-medium text-gray-900 mb-4">Selected Beading</h4>
+                        <div className="space-y-4">
                           {selections.beading.map((bead, index) => (
-                            <div key={index} className="flex justify-between text-sm">
-                              <span>
-                                {bead.name} (×{bead.quantity})
-                              </span>
-                              <span className="font-medium">£{bead.totalPrice.toFixed(2)}</span>
+                            <div key={index} className="flex items-center gap-4 p-3 bg-white rounded-lg border">
+                              <div className="flex-1">
+                                <h5 className="font-medium text-gray-900">{bead.name}</h5>
+                                <p className="text-sm text-gray-600">
+                                  £{bead.price.toFixed(2)} per {bead.length}m length
+                                </p>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium text-gray-700">Qty:</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={bead.quantity}
+                                  onChange={(e) => updateBeadingQuantity(bead.id, Number.parseInt(e.target.value) || 1)}
+                                  className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+                                />
+                              </div>
+
+                              <div className="text-right">
+                                <div className="font-medium text-gray-900">£{bead.totalPrice.toFixed(2)}</div>
+                              </div>
+
+                              <button
+                                onClick={() => removeBeading(bead.id)}
+                                className="text-red-600 hover:text-red-800 p-1"
+                              >
+                                ✕
+                              </button>
                             </div>
                           ))}
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-900">Beading Total:</span>
+                            <span className="font-bold text-gray-900">
+                              £{selections.beading.reduce((sum, b) => sum + b.totalPrice, 0).toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -546,55 +722,59 @@ export default function Calculator() {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {getAccessoryOptions().map((accessory: any) => {
-                        const isSelected = selections.accessories.some((a) => a.id === accessory.id)
-                        const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
-                        const savings = accessory.price - discountedPrice
+                    {Object.entries(getAccessoryOptions()).map(([category, accessories]: [string, any[]]) => (
+                      <div key={category} className="bg-white border border-gray-200 rounded-lg p-6">
+                        <h4 className="text-lg font-semibold text-gray-900 mb-4">{category}</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {accessories.map((accessory: any) => {
+                            const isSelected = selections.accessories.some((a) => a.id === accessory.id)
+                            const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
+                            const savings = accessory.price - discountedPrice
 
-                        return (
-                          <div
-                            key={accessory.id}
-                            onClick={() => toggleAccessory(accessory)}
-                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                              isSelected
-                                ? "border-blue-600 bg-blue-50"
-                                : "border-gray-200 bg-white hover:border-gray-300"
-                            }`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-medium text-gray-900">{accessory.name}</h4>
-                                  <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                                    {accessory.category}
-                                  </span>
-                                </div>
-                                <div className="text-sm text-gray-700 mb-2">
-                                  {savings > 0 ? (
-                                    <div>
-                                      <span className="line-through text-gray-500">£{accessory.price.toFixed(2)}</span>
-                                      <span className="ml-2 font-medium text-green-600">
-                                        £{discountedPrice.toFixed(2)}
-                                      </span>
-                                      <span className="ml-1 text-xs text-green-600">(Save £{savings.toFixed(2)})</span>
+                            return (
+                              <div
+                                key={accessory.id}
+                                onClick={() => toggleAccessory(accessory)}
+                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                  isSelected
+                                    ? "border-blue-600 bg-blue-50"
+                                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <h5 className="font-medium text-gray-900 mb-2">{accessory.name}</h5>
+                                    <div className="text-sm text-gray-700 mb-2">
+                                      {savings > 0 ? (
+                                        <div>
+                                          <span className="line-through text-gray-500">
+                                            £{accessory.price.toFixed(2)}
+                                          </span>
+                                          <span className="ml-2 font-medium text-green-600">
+                                            £{discountedPrice.toFixed(2)}
+                                          </span>
+                                          <span className="ml-1 text-xs text-green-600">
+                                            (Save £{savings.toFixed(2)})
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <span className="font-medium">£{accessory.price.toFixed(2)}</span>
+                                      )}
                                     </div>
-                                  ) : (
-                                    <span className="font-medium">£{accessory.price.toFixed(2)}</span>
-                                  )}
+                                    {accessory.bundle_discount && (
+                                      <p className="text-xs text-green-600 mb-1">
+                                        {Math.round(accessory.bundle_discount * 100)}% bundle discount applied
+                                      </p>
+                                    )}
+                                  </div>
+                                  {isSelected && <div className="text-blue-600 text-xl ml-2">✓</div>}
                                 </div>
-                                {accessory.bundle_discount && (
-                                  <p className="text-xs text-green-600 mb-1">
-                                    {Math.round(accessory.bundle_discount * 100)}% bundle discount applied
-                                  </p>
-                                )}
                               </div>
-                              {isSelected && <div className="text-blue-600 text-xl ml-2">✓</div>}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ))}
 
                     {selections.accessories.length > 0 && (
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -605,10 +785,21 @@ export default function Calculator() {
                             return (
                               <div key={index} className="flex justify-between text-sm">
                                 <span>{accessory.name}</span>
-                                <span className="font-medium">£{discountedPrice.toFixed(2)}</span>
+                                <span>£{discountedPrice.toFixed(2)}</span>
                               </div>
                             )
                           })}
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-900">Accessories Total:</span>
+                            <span className="font-bold text-gray-900">
+                              £
+                              {selections.accessories
+                                .reduce((sum, a) => sum + a.price * (1 - (a.bundle_discount || 0)), 0)
+                                .toFixed(2)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -621,12 +812,12 @@ export default function Calculator() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Choose Color</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Select your preferred render color. All colors are available at no extra cost.
+                        Select your preferred render color. Some colors may have additional costs.
                       </p>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {colors.map((color) => (
+                      {colorVariants.map((color) => (
                         <div
                           key={color.id}
                           onClick={() => setSelections((prev) => ({ ...prev, color: color.id }))}
@@ -643,6 +834,11 @@ export default function Calculator() {
                             />
                             <div className="text-center">
                               <h4 className="font-medium text-gray-900">{color.name}</h4>
+                              {color.price_adjustment > 0 && (
+                                <p className="text-xs text-orange-600 mt-1">
+                                  +£{color.price_adjustment.toFixed(2)} per bag
+                                </p>
+                              )}
                               {selections.color === color.id && <div className="text-blue-600 text-lg mt-1">✓</div>}
                             </div>
                           </div>
@@ -667,10 +863,10 @@ export default function Calculator() {
                       <h4 className="font-semibold text-green-800 mb-2">Render System</h4>
                       <div className="space-y-1 text-sm">
                         <p>
-                          <strong>System:</strong> {recommendation?.system}
+                          <strong>System:</strong> {selections.selectedSystem?.systemData.name}
                         </p>
                         <p>
-                          <strong>Brand:</strong> {recommendation?.brand}
+                          <strong>Brand:</strong> {selections.selectedSystem?.brandName}
                         </p>
                         <p>
                           <strong>Area:</strong> {selections.area}m²
@@ -685,13 +881,13 @@ export default function Calculator() {
                         </p>
                         {selections.color && (
                           <p>
-                            <strong>Color:</strong> {colors.find((c) => c.id === selections.color)?.name}
+                            <strong>Color:</strong> {colorVariants.find((c) => c.id === selections.color)?.name}
                           </p>
                         )}
                       </div>
                       <div className="mt-3 pt-3 border-t border-green-200">
                         <p className="font-semibold text-green-800">
-                          System Cost: £{recommendation?.totalCost.toFixed(2)}
+                          System Cost: £{selections.selectedSystem?.totalCost.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -792,16 +988,17 @@ export default function Calculator() {
                   ) : (
                     <button
                       onClick={() => {
-                        // Reset for new calculation
                         setSelections({
                           projectType: null,
                           substrate: null,
                           area: "",
+                          selectedSystem: null,
                           beading: [],
                           accessories: [],
                           color: null,
                         })
-                        setRecommendation(null)
+                        setAvailableSystems([])
+                        setColorVariants([])
                         setCurrentStep(0)
                       }}
                       className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
@@ -843,10 +1040,10 @@ export default function Calculator() {
                 </div>
               )}
 
-              {recommendation && (
+              {selections.selectedSystem && (
                 <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-1">Recommended System</label>
-                  <p className="text-sm text-gray-900">{recommendation.system}</p>
+                  <label className="text-sm font-medium text-gray-600 block mb-1">Selected System</label>
+                  <p className="text-sm text-gray-900">{selections.selectedSystem.systemData.name}</p>
                 </div>
               )}
 
@@ -867,11 +1064,11 @@ export default function Calculator() {
               {selections.color && (
                 <div>
                   <label className="text-sm font-medium text-gray-600 block mb-1">Color</label>
-                  <p className="text-sm text-gray-900">{colors.find((c) => c.id === selections.color)?.name}</p>
+                  <p className="text-sm text-gray-900">{colorVariants.find((c) => c.id === selections.color)?.name}</p>
                 </div>
               )}
 
-              {recommendation && (
+              {selections.selectedSystem && (
                 <div className="pt-4 border-t border-gray-200">
                   <label className="text-sm font-medium text-gray-600 block mb-1">Estimated Total</label>
                   <p className="text-lg font-bold text-gray-900">£{calculateTotalCost().toFixed(2)}</p>

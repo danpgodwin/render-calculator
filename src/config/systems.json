@@ -8,23 +8,35 @@
           "name": "Parex Scratch Render System",
           "description": "Traditional 3-coat system for maximum durability",
           "components": {
+            "basecoat": {
+              "name": "Parex DPM BaseCoat 25kg",
+              "shopify_handle": "parex-dpm-basecoat-25kg",
+              "price": 45.00,
+              "coverage_per_unit": 14,
+              "unit": "m²"
+            },
             "mesh": {
               "name": "Parex Reinforcement Mesh 50m",
-              "shopify_handle": "parex-tv10-reinforcing-mesh-50mtr-x-1mtr",
-              "price": 79.90,
+              "shopify_handle": "parex-reinforcement-mesh-50m",
+              "price": 28.00,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
             "topcoat": {
               "name": "Parex Monorex GM TopCoat 25kg",
-              "shopify_handle": "parex-monorex-gm-scraped-textured-render",
-              "price": 11.40,
-              "coverage_per_unit": 1,
+              "shopify_handle": "parex-monorex-gm-topcoat-25kg",
+              "price": 52.00,
+              "coverage_per_unit": 22,
               "unit": "m²"
             }
           },
           "suitable_substrates": [
-            "concrete-block"
+            "concrete-block",
+            "clay-brick",
+            "solid-brick",
+            "cavity-brick",
+            "pebbledash",
+            "blown-render"
           ],
           "performance": {
             "durability": 9,

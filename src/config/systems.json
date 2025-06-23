@@ -6,7 +6,7 @@
       "systems": {
         "scratch": {
           "name": "Parex Scratch Render System",
-          "description": "Traditional 3-coat system for maximum durability",
+          "description": "Traditional 1-coat system for maximum durability",
           "components": {
             "mesh": {
               "name": "Parex Reinforcement Mesh 50m",
@@ -110,18 +110,13 @@
             }
           },
           "suitable_substrates": [
-            "stone-masonry",
-            "concrete-block-existing",
-            "painted-masonry",
-            "tyrolean",
-            "textured-render",
-            "cracked-render"
+            "concrete-block"
           ],
           "performance": {
             "durability": 8,
             "ease_of_application": 8,
             "cost_effectiveness": 9,
-            "weather_resistance": 8
+            "weather_resistance": 7
           }
         },
         "thincoat": {
@@ -129,36 +124,36 @@
           "description": "Natural thin coat system for modern applications",
           "components": {
             "basecoat": {
-              "name": "EcoRend BaseCoat 25kg",
-              "shopify_handle": "ecoRend-basecoat-25kg",
+              "name": "EcoRend BaseCoat X32",
+              "shopify_handle": "ecorend-x32-one-coat-base",
               "price": 42.00,
-              "coverage_per_unit": 15,
+              "coverage_per_unit": 1.3369,
               "unit": "m²"
             },
             "mesh": {
               "name": "EcoRend Reinforcement Mesh 50m",
-              "shopify_handle": "ecoRend-reinforcement-mesh-50m",
+              "shopify_handle": "ecorend-standard-mesh-50-mtrs",
               "price": 26.00,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
-            "topcoat": {
-              "name": "EcoRend TC TopCoat 25kg",
-              "shopify_handle": "ecoRend-tc-topcoat-25kg",
+            "primer": {
+              "name": "EcoRend SP Primer",
+              "shopify_handle": "ecorend-sp15-silicone-primer-25kg",
               "price": 44.00,
               "coverage_per_unit": 16,
+              "unit": "m²"
+            },
+            "topcoat": {
+              "name": "EcoRend SR15 Silicone TopCoat",
+              "shopify_handle": "ecorend-sr15-silicone-thin-coat-render-1-5mm-25kg",
+              "price": 44.00,
+              "coverage_per_unit": 9,
               "unit": "m²"
             }
           },
           "suitable_substrates": [
-            "steel-frame",
-            "timber-frame",
-            "mineral-wool",
-            "phenolic-insulation",
-            "wood-fiber",
-            "cork-insulation",
-            "tile-hung",
-            "weatherboard"
+            "concrete-block"
           ],
           "performance": {
             "durability": 7,
@@ -354,35 +349,35 @@
   "beading": {
     "scratch_render": [
       {
-        "id": "sas-angle-15mm",
+        "id": "9457527947607/variants/48838027608407",
         "name": "SAS Angle Bead 15mm",
         "description": "Recommended for external corners",
         "price": 3.50,
-        "length": 2.5,
+        "length": 3,
         "recommended": true
       },
       {
-        "id": "sas-angle-10mm",
+        "id": "9457527947607/variants/48838027542871",
         "name": "SAS Angle Bead 10mm",
         "description": "Alternative for external corners",
         "price": 3.20,
-        "length": 2.5,
+        "length": 3,
         "recommended": false
       },
       {
-        "id": "sas-stop-15mm",
+        "id": "9457527718231/variants/48838025773399",
         "name": "SAS Stop Bead 15mm",
         "description": "Recommended for render termination",
         "price": 3.80,
-        "length": 2.5,
+        "length": 3,
         "recommended": true
       },
       {
-        "id": "sas-stop-10mm",
+        "id": "9457527718231/variants/48838025707863",
         "name": "SAS Stop Bead 10mm",
         "description": "Alternative for render termination",
         "price": 3.50,
-        "length": 2.5,
+        "length": 3,
         "recommended": false
       },
       {
@@ -390,7 +385,7 @@
         "name": "SAS Bellcast Bead",
         "description": "For water shedding applications",
         "price": 4.20,
-        "length": 2.5,
+        "length": 3,
         "recommended": false
       },
       {

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid handles array" }, { status: 400 })
     }
 
-    // Build GraphQL query for multiple products
+    // Build GraphQL query for multiple products with full variant details
     const handlesQuery = handles.map((handle) => `"${handle}"`).join(", ")
 
     const query = `
@@ -21,13 +21,18 @@ export async function POST(request: NextRequest) {
             node {
               handle
               title
+              productType
               priceRange {
                 minVariantPrice {
                   amount
                   currencyCode
                 }
+                maxVariantPrice {
+                  amount
+                  currencyCode
+                }
               }
-              variants(first: 10) {
+              variants(first: 50) {
                 edges {
                   node {
                     id
@@ -37,6 +42,22 @@ export async function POST(request: NextRequest) {
                       currencyCode
                     }
                     availableForSale
+                    selectedOptions {
+                      name
+                      value
+                    }
+                    image {
+                      url
+                      altText
+                    }
+                  }
+                }
+              }
+              images(first: 10) {
+                edges {
+                  node {
+                    url
+                    altText
                   }
                 }
               }
@@ -65,15 +86,39 @@ export async function POST(request: NextRequest) {
     const products: Record<string, any> = {}
 
     data.data.products.edges.forEach(({ node }: any) => {
+      const variants = node.variants.edges.map(({ node: variant }: any) => ({
+        id: variant.id,
+        title: variant.title,
+        price: Number.parseFloat(variant.price.amount),
+        availableForSale: variant.availableForSale,
+        selectedOptions: variant.selectedOptions,
+        image: variant.image,
+      }))
+
+      // Check if this product has color variants
+      const hasColorVariants = variants.some((variant: any) =>
+        variant.selectedOptions.some(
+          (option: any) => option.name.toLowerCase() === "color" || option.name.toLowerCase() === "colour",
+        ),
+      )
+
+      // Get price range for products with variants
+      const prices = variants.map((v: any) => v.price)
+      const minPrice = Math.min(...prices)
+      const maxPrice = Math.max(...prices)
+
       products[node.handle] = {
         title: node.title,
-        price: Number.parseFloat(node.priceRange.minVariantPrice.amount),
+        productType: node.productType,
+        price: minPrice,
+        maxPrice: maxPrice,
+        hasColorVariants,
+        showFromPrice: hasColorVariants && minPrice !== maxPrice,
         currency: node.priceRange.minVariantPrice.currencyCode,
-        variants: node.variants.edges.map(({ node: variant }: any) => ({
-          id: variant.id,
-          title: variant.title,
-          price: Number.parseFloat(variant.price.amount),
-          availableForSale: variant.availableForSale,
+        variants,
+        images: node.images.edges.map(({ node: image }: any) => ({
+          url: image.url,
+          altText: image.altText,
         })),
       }
     })

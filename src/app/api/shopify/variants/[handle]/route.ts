@@ -26,6 +26,10 @@ export async function GET(request: NextRequest, { params }: { params: { handle: 
                   name
                   value
                 }
+                image {
+                  url
+                  altText
+                }
               }
             }
           }
@@ -58,46 +62,41 @@ export async function GET(request: NextRequest, { params }: { params: { handle: 
     const product = data.data.productByHandle
 
     // Transform variants into color options
-    const colorVariants = product.variants.edges.map(({ node }: any) => {
-      const colorOption = node.selectedOptions.find(
-        (option: any) => option.name.toLowerCase() === "color" || option.name.toLowerCase() === "colour",
-      )
+    const colorVariants = product.variants.edges
+      .map(({ node }: any) => {
+        const colorOption = node.selectedOptions.find(
+          (option: any) => option.name.toLowerCase() === "color" || option.name.toLowerCase() === "colour",
+        )
 
-      return {
-        id: node.id,
-        name: colorOption ? colorOption.value : node.title,
-        price: Number.parseFloat(node.price.amount),
-        availableForSale: node.availableForSale,
-        // You can add hex color mapping here based on color names
-        hex: getColorHex(colorOption ? colorOption.value : node.title),
-      }
-    })
+        if (!colorOption) return null
+
+        return {
+          id: node.id,
+          name: colorOption.value,
+          price: Number.parseFloat(node.price.amount),
+          availableForSale: node.availableForSale,
+          image: node.image,
+          variantTitle: node.title,
+        }
+      })
+      .filter(Boolean)
+
+    // Calculate price adjustments from base price
+    const basePrice = colorVariants.length > 0 ? Math.min(...colorVariants.map((v: any) => v.price)) : 0
+    const colorOptions = colorVariants.map((variant: any) => ({
+      ...variant,
+      price_adjustment: variant.price - basePrice,
+    }))
 
     return NextResponse.json({
       product: {
         title: product.title,
         handle: product.handle,
       },
-      colorVariants,
+      colorVariants: colorOptions,
     })
   } catch (error) {
     console.error("Shopify Variants API Error:", error)
     return NextResponse.json({ error: "Failed to fetch product variants" }, { status: 500 })
   }
-}
-
-// Helper function to map color names to hex values
-function getColorHex(colorName: string): string {
-  const colorMap: Record<string, string> = {
-    white: "#FFFFFF",
-    "pure white": "#FFFFFF",
-    cream: "#F5F5DC",
-    "light grey": "#D3D3D3",
-    "dark grey": "#696969",
-    beige: "#F5F5DC",
-    sandstone: "#FAD5A5",
-    // Add more color mappings as needed
-  }
-
-  return colorMap[colorName.toLowerCase()] || "#CCCCCC"
 }

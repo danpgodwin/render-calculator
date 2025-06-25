@@ -32,7 +32,7 @@ export default function Calculator() {
 
   const progress = ((currentStep + 1) / steps.length) * 100
 
-  // Fetch Shopify prices
+  // Fetch Shopify prices with enhanced data
   const fetchShopifyPrices = async (handles: string[]) => {
     try {
       const response = await fetch("/api/shopify/products", {
@@ -55,10 +55,10 @@ export default function Calculator() {
     }
   }
 
+  // Enhanced price function with "from" pricing support
   const getPrice = (handle: string, variantId?: string) => {
-    // Check Shopify price first, fallback to JSON
     const shopifyProduct = shopifyPrices[handle]
-    if (shopifyProduct?.price) {
+    if (shopifyProduct?.price !== undefined) {
       if (variantId && shopifyProduct.variants) {
         const variant = shopifyProduct.variants.find((v: any) => v.id === variantId)
         return variant?.price || shopifyProduct.price
@@ -79,6 +79,95 @@ export default function Calculator() {
     }
 
     return 0
+  }
+
+  // Get display price with "from" prefix for color variants
+  const getDisplayPrice = (handle: string) => {
+    const shopifyProduct = shopifyPrices[handle]
+    if (shopifyProduct?.showFromPrice) {
+      return `from £${shopifyProduct.price.toFixed(2)}`
+    }
+    return `£${getPrice(handle).toFixed(2)}`
+  }
+
+  // Smart bundling for area-based accessories
+  const calculateOptimalQuantity = (accessory: any, area: number) => {
+    if (!accessory.area_based) {
+      return { quantity: 1, totalPrice: accessory.price }
+    }
+
+    const shopifyProduct = shopifyPrices[accessory.shopify_handle]
+    if (!shopifyProduct?.variants || shopifyProduct.variants.length <= 1) {
+      // Single variant or no Shopify data - use simple calculation
+      const quantity = Math.ceil(area / (accessory.coverage_per_unit || 1))
+      return { quantity, totalPrice: quantity * accessory.price }
+    }
+
+    // Multiple variants - find optimal combination
+    const variants = shopifyProduct.variants
+      .map((v: any) => {
+        // Extract size from variant title (e.g., "5kg", "25kg")
+        const sizeMatch = v.title.match(/(\d+)kg/i)
+        const coverage = sizeMatch
+          ? Number.parseInt(sizeMatch[1]) * (accessory.coverage_per_unit / 25)
+          : accessory.coverage_per_unit
+
+        return {
+          ...v,
+          coverage,
+          pricePerUnit: v.price / coverage,
+        }
+      })
+      .sort((a: any, b: any) => a.pricePerUnit - b.pricePerUnit)
+
+    // Simple greedy algorithm - use largest size first
+    let remainingArea = area
+    let totalCost = 0
+    const quantities: any[] = []
+
+    for (const variant of variants.reverse()) {
+      if (remainingArea <= 0) break
+
+      const quantity = Math.floor(remainingArea / variant.coverage)
+      if (quantity > 0) {
+        quantities.push({ variant, quantity })
+        totalCost += quantity * variant.price
+        remainingArea -= quantity * variant.coverage
+      }
+    }
+
+    // Handle remaining area with smallest variant
+    if (remainingArea > 0 && variants.length > 0) {
+      const smallestVariant = variants[variants.length - 1]
+      const additionalQuantity = Math.ceil(remainingArea / smallestVariant.coverage)
+
+      const existingEntry = quantities.find((q) => q.variant.id === smallestVariant.id)
+      if (existingEntry) {
+        existingEntry.quantity += additionalQuantity
+      } else {
+        quantities.push({ variant: smallestVariant, quantity: additionalQuantity })
+      }
+      totalCost += additionalQuantity * smallestVariant.price
+    }
+
+    return {
+      quantities,
+      totalPrice: totalCost,
+      breakdown: quantities.map((q) => `${q.quantity}x ${q.variant.title}`).join(", "),
+    }
+  }
+
+  // Enhanced beading selection with size options
+  const getBeadingVariant = (bead: any, selectedSize = "15mm") => {
+    const shopifyProduct = shopifyPrices[bead.shopify_handle]
+    if (!shopifyProduct?.variants) {
+      return null
+    }
+
+    // Find variant matching the selected size
+    const variant = shopifyProduct.variants.find((v: any) => v.title.toLowerCase().includes(selectedSize.toLowerCase()))
+
+    return variant || shopifyProduct.variants[0]
   }
 
   const validateStep = (step: number): boolean => {
@@ -124,13 +213,12 @@ export default function Calculator() {
             systemKey,
             systemData: system,
             score,
-            isRecommended: false, // Will be set for highest scoring system
+            isRecommended: false,
           })
         }
       })
     })
 
-    // Sort by score and mark the highest as recommended
     compatibleSystems.sort((a, b) => b.score - a.score)
     if (compatibleSystems.length > 0) {
       compatibleSystems[0].isRecommended = true
@@ -156,6 +244,7 @@ export default function Calculator() {
         price,
         totalPrice,
         componentType: componentKey,
+        displayPrice: getDisplayPrice(component.shopify_handle),
       })
     })
 
@@ -168,7 +257,6 @@ export default function Calculator() {
 
     const systems = findCompatibleSystems(projectType, substrate)
 
-    // Calculate costs for each system
     const systemsWithCosts = systems.map((system) => {
       const { components, totalCost } = calculateSystemCost(system.systemData, area)
       return {
@@ -191,7 +279,7 @@ export default function Calculator() {
 
     // Fetch color variants for the topcoat
     const topcoat = system.components.find((comp: any) => comp.componentType === "topcoat")
-    if (topcoat) {
+    if (topcoat && topcoat.has_color_variants) {
       fetchColorVariants(topcoat.shopify_handle)
     }
   }
@@ -205,27 +293,14 @@ export default function Calculator() {
       }
 
       const data = await response.json()
-
-      // Transform Shopify variants into color options
-      const colors = data.colorVariants.map((variant: any) => ({
-        id: variant.id,
-        name: variant.name,
-        hex: variant.hex,
-        price_adjustment: variant.price - data.colorVariants[0].price, // Calculate difference from base price
-        availableForSale: variant.availableForSale,
-      }))
-
-      setColorVariants(colors)
+      setColorVariants(data.colorVariants)
     } catch (error) {
       console.error("Error fetching color variants:", error)
       // Fallback to default colors
       const defaultColors = [
-        { id: "white", name: "Pure White", hex: "#FFFFFF", price_adjustment: 0 },
-        { id: "cream", name: "Cream", hex: "#F5F5DC", price_adjustment: 0 },
-        { id: "light-grey", name: "Light Grey", hex: "#D3D3D3", price_adjustment: 0 },
-        { id: "dark-grey", name: "Dark Grey", hex: "#696969", price_adjustment: 5 },
-        { id: "beige", name: "Beige", hex: "#F5F5DC", price_adjustment: 0 },
-        { id: "sandstone", name: "Sandstone", hex: "#FAD5A5", price_adjustment: 3 },
+        { id: "white", name: "Pure White", price_adjustment: 0, image: null },
+        { id: "cream", name: "Cream", price_adjustment: 0, image: null },
+        { id: "light-grey", name: "Light Grey", price_adjustment: 0, image: null },
       ]
       setColorVariants(defaultColors)
     }
@@ -245,29 +320,44 @@ export default function Calculator() {
       const categoryName = category.charAt(0).toUpperCase() + category.slice(1)
       categorizedAccessories[categoryName] = items.map((item: any) => ({
         ...item,
-        price: getPrice(item.shopify_handle || `${item.id}-handle`),
+        price: getPrice(item.shopify_handle),
       }))
     })
 
     return categorizedAccessories
   }
 
-  const updateBeadingQuantity = (beadId: string, quantity: number) => {
+  const updateBeadingQuantity = (beadId: string, quantity: number, selectedSize = "15mm") => {
     setSelections((prev) => ({
       ...prev,
-      beading: prev.beading.map((bead) =>
-        bead.id === beadId
-          ? { ...bead, quantity, totalPrice: quantity * getPrice(bead.shopify_handle || `${bead.id}-handle`) }
-          : bead,
-      ),
+      beading: prev.beading.map((bead) => {
+        if (bead.id === beadId) {
+          const variant = getBeadingVariant(bead, selectedSize)
+          const price = variant ? variant.price : getPrice(bead.shopify_handle)
+          return {
+            ...bead,
+            quantity,
+            selectedSize,
+            variantId: variant?.id,
+            price,
+            totalPrice: quantity * price,
+          }
+        }
+        return bead
+      }),
     }))
   }
 
   const addBeading = (beadItem: any) => {
-    const price = getPrice(beadItem.shopify_handle || `${beadItem.id}-handle`)
+    const defaultSize = beadItem.default_size || "15mm"
+    const variant = getBeadingVariant(beadItem, defaultSize)
+    const price = variant ? variant.price : getPrice(beadItem.shopify_handle)
+
     const beadWithQuantity = {
       ...beadItem,
       quantity: 1,
+      selectedSize: defaultSize,
+      variantId: variant?.id,
       price,
       totalPrice: price,
     }
@@ -294,9 +384,19 @@ export default function Calculator() {
         accessories: prev.accessories.filter((a) => a.id !== accessoryItem.id),
       }))
     } else {
+      // Calculate optimal quantity for area-based accessories
+      const area = Number.parseFloat(selections.area)
+      const optimal = calculateOptimalQuantity(accessoryItem, area)
+
       setSelections((prev) => ({
         ...prev,
-        accessories: [...prev.accessories, accessoryItem],
+        accessories: [
+          ...prev.accessories,
+          {
+            ...accessoryItem,
+            ...optimal,
+          },
+        ],
       }))
     }
   }
@@ -311,7 +411,7 @@ export default function Calculator() {
 
     // Add accessory costs
     selections.accessories.forEach((accessory) => {
-      const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
+      const discountedPrice = accessory.totalPrice * (1 - (accessory.bundle_discount || 0))
       total += discountedPrice
     })
 
@@ -329,7 +429,6 @@ export default function Calculator() {
     return total
   }
 
-  // Add this new function for adding to Shopify cart
   const addToShopifyCart = async (cartItems: any[]) => {
     try {
       const response = await fetch("/api/shopify/cart/add", {
@@ -358,7 +457,7 @@ export default function Calculator() {
     }
   }
 
-  const addToCart = async () => {
+  const addToCart = () => {
     const cartItem = {
       id: Date.now(),
       selectedSystem: selections.selectedSystem,
@@ -371,43 +470,7 @@ export default function Calculator() {
       substrate: selections.substrate,
     }
 
-    // Add to local cart
     setCart([...cart, cartItem])
-
-    // Prepare items for Shopify cart
-    const shopifyItems: any[] = []
-
-    // Add system components
-    selections.selectedSystem?.components.forEach((component: any) => {
-      shopifyItems.push({
-        variantId: component.shopify_variant_id || component.shopify_handle, // You'll need to store variant IDs
-        quantity: component.quantity,
-      })
-    })
-
-    // Add beading items
-    selections.beading.forEach((bead) => {
-      shopifyItems.push({
-        variantId: bead.shopify_variant_id || bead.shopify_handle,
-        quantity: bead.quantity,
-      })
-    })
-
-    // Add accessories
-    selections.accessories.forEach((accessory) => {
-      shopifyItems.push({
-        variantId: accessory.shopify_variant_id || accessory.shopify_handle,
-        quantity: 1,
-      })
-    })
-
-    // Add to Shopify cart
-    try {
-      await addToShopifyCart(shopifyItems)
-      alert("Items added to cart successfully!")
-    } catch (error) {
-      alert("Error adding items to cart. Please try again.")
-    }
 
     // Reset for new calculation
     setSelections({
@@ -677,7 +740,7 @@ export default function Calculator() {
                                 <div key={compIndex} className="bg-gray-50 p-3 rounded">
                                   <div className="font-medium text-sm text-gray-900 mb-1">{component.name}</div>
                                   <div className="text-xs text-gray-600">
-                                    Qty: {component.quantity} × £{component.price.toFixed(2)} = £
+                                    Qty: {component.quantity} × {component.displayPrice} = £
                                     {component.totalPrice.toFixed(2)}
                                   </div>
                                 </div>
@@ -696,7 +759,8 @@ export default function Calculator() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Select Beading (Optional)</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Add beading to protect edges and corners. Specify the exact quantities you need.
+                        Add beading to protect edges and corners. All beads are colour matched to your render. We
+                        recommend 15mm for optimal protection.
                       </p>
                     </div>
 
@@ -706,7 +770,7 @@ export default function Calculator() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {getBeadingOptions().map((bead: any) => {
                           const isAdded = selections.beading.some((b) => b.id === bead.id)
-                          const price = getPrice(bead.shopify_handle || `${bead.id}-handle`)
+                          const price = getPrice(bead.shopify_handle)
 
                           return (
                             <div
@@ -727,8 +791,13 @@ export default function Calculator() {
                                   </div>
                                   <p className="text-sm text-gray-600 mb-2">{bead.description}</p>
                                   <p className="text-sm font-medium text-gray-900">
-                                    £{price.toFixed(2)} per {bead.length}m length
+                                    {getDisplayPrice(bead.shopify_handle)} per {bead.length}m length
                                   </p>
+                                  {bead.available_sizes && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      Available sizes: {bead.available_sizes.join(", ")}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
 
@@ -764,13 +833,36 @@ export default function Calculator() {
                                 </p>
                               </div>
 
+                              {bead.available_sizes && bead.available_sizes.length > 1 && (
+                                <div className="flex items-center gap-2">
+                                  <label className="text-sm font-medium text-gray-700">Size:</label>
+                                  <select
+                                    value={bead.selectedSize || bead.default_size}
+                                    onChange={(e) => updateBeadingQuantity(bead.id, bead.quantity, e.target.value)}
+                                    className="px-2 py-1 border border-gray-300 rounded text-sm"
+                                  >
+                                    {bead.available_sizes.map((size: string) => (
+                                      <option key={size} value={size}>
+                                        {size}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+
                               <div className="flex items-center gap-2">
                                 <label className="text-sm font-medium text-gray-700">Qty:</label>
                                 <input
                                   type="number"
                                   min="1"
                                   value={bead.quantity}
-                                  onChange={(e) => updateBeadingQuantity(bead.id, Number.parseInt(e.target.value) || 1)}
+                                  onChange={(e) =>
+                                    updateBeadingQuantity(
+                                      bead.id,
+                                      Number.parseInt(e.target.value) || 1,
+                                      bead.selectedSize,
+                                    )
+                                  }
                                   className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
                                 />
                               </div>
@@ -809,7 +901,7 @@ export default function Calculator() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Add Accessories (Optional)</h3>
                       <p className="text-sm text-gray-600 mb-4">
                         Enhance your project with professional tools and accessories. Bundle discounts applied
-                        automatically.
+                        automatically. Area-based products are optimally calculated.
                       </p>
                     </div>
 
@@ -819,8 +911,10 @@ export default function Calculator() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {accessories.map((accessory: any) => {
                             const isSelected = selections.accessories.some((a) => a.id === accessory.id)
-                            const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
-                            const savings = accessory.price - discountedPrice
+                            const area = Number.parseFloat(selections.area)
+                            const optimal = calculateOptimalQuantity(accessory, area)
+                            const discountedPrice = optimal.totalPrice * (1 - (accessory.bundle_discount || 0))
+                            const savings = optimal.totalPrice - discountedPrice
 
                             return (
                               <div
@@ -835,11 +929,16 @@ export default function Calculator() {
                                 <div className="flex items-start justify-between">
                                   <div className="flex-1">
                                     <h5 className="font-medium text-gray-900 mb-2">{accessory.name}</h5>
+
+                                    {accessory.area_based && optimal.breakdown && (
+                                      <p className="text-xs text-blue-600 mb-2">Optimal: {optimal.breakdown}</p>
+                                    )}
+
                                     <div className="text-sm text-gray-700 mb-2">
                                       {savings > 0 ? (
                                         <div>
                                           <span className="line-through text-gray-500">
-                                            £{accessory.price.toFixed(2)}
+                                            £{optimal.totalPrice.toFixed(2)}
                                           </span>
                                           <span className="ml-2 font-medium text-green-600">
                                             £{discountedPrice.toFixed(2)}
@@ -849,7 +948,7 @@ export default function Calculator() {
                                           </span>
                                         </div>
                                       ) : (
-                                        <span className="font-medium">£{accessory.price.toFixed(2)}</span>
+                                        <span className="font-medium">£{optimal.totalPrice.toFixed(2)}</span>
                                       )}
                                     </div>
                                     {accessory.bundle_discount && (
@@ -872,10 +971,15 @@ export default function Calculator() {
                         <h4 className="font-medium text-gray-900 mb-2">Selected Accessories</h4>
                         <div className="space-y-2">
                           {selections.accessories.map((accessory, index) => {
-                            const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
+                            const discountedPrice = accessory.totalPrice * (1 - (accessory.bundle_discount || 0))
                             return (
                               <div key={index} className="flex justify-between text-sm">
-                                <span>{accessory.name}</span>
+                                <span>
+                                  {accessory.name}
+                                  {accessory.breakdown && (
+                                    <span className="text-gray-500 ml-2">({accessory.breakdown})</span>
+                                  )}
+                                </span>
                                 <span>£{discountedPrice.toFixed(2)}</span>
                               </div>
                             )
@@ -887,7 +991,7 @@ export default function Calculator() {
                             <span className="font-bold text-gray-900">
                               £
                               {selections.accessories
-                                .reduce((sum, a) => sum + a.price * (1 - (a.bundle_discount || 0)), 0)
+                                .reduce((sum, a) => sum + a.totalPrice * (1 - (a.bundle_discount || 0)), 0)
                                 .toFixed(2)}
                             </span>
                           </div>
@@ -919,10 +1023,17 @@ export default function Calculator() {
                           }`}
                         >
                           <div className="flex flex-col items-center gap-3">
-                            <div
-                              className="w-16 h-16 rounded-full border-2 border-gray-300"
-                              style={{ backgroundColor: color.hex }}
-                            />
+                            {color.image ? (
+                              <img
+                                src={color.image.url || "/placeholder.svg"}
+                                alt={color.image.altText || color.name}
+                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-300"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 rounded-full border-2 border-gray-300 bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                                No Image
+                              </div>
+                            )}
                             <div className="text-center">
                               <h4 className="font-medium text-gray-900">{color.name}</h4>
                               {color.price_adjustment > 0 && (
@@ -991,7 +1102,7 @@ export default function Calculator() {
                           {selections.beading.map((bead, index) => (
                             <div key={index} className="flex justify-between">
                               <span>
-                                {bead.name} (×{bead.quantity})
+                                {bead.name} {bead.selectedSize} (×{bead.quantity})
                               </span>
                               <span>£{bead.totalPrice.toFixed(2)}</span>
                             </div>
@@ -1011,10 +1122,15 @@ export default function Calculator() {
                         <h4 className="font-semibold text-purple-800 mb-2">Accessories</h4>
                         <div className="space-y-1 text-sm">
                           {selections.accessories.map((accessory, index) => {
-                            const discountedPrice = accessory.price * (1 - (accessory.bundle_discount || 0))
+                            const discountedPrice = accessory.totalPrice * (1 - (accessory.bundle_discount || 0))
                             return (
                               <div key={index} className="flex justify-between">
-                                <span>{accessory.name}</span>
+                                <span>
+                                  {accessory.name}
+                                  {accessory.breakdown && (
+                                    <span className="text-gray-500 ml-2">({accessory.breakdown})</span>
+                                  )}
+                                </span>
                                 <span>£{discountedPrice.toFixed(2)}</span>
                               </div>
                             )
@@ -1024,7 +1140,7 @@ export default function Calculator() {
                           <p className="font-semibold text-purple-800">
                             Accessories Total: £
                             {selections.accessories
-                              .reduce((sum, a) => sum + a.price * (1 - (a.bundle_discount || 0)), 0)
+                              .reduce((sum, a) => sum + a.totalPrice * (1 - (a.bundle_discount || 0)), 0)
                               .toFixed(2)}
                           </p>
                         </div>

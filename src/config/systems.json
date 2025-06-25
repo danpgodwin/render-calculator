@@ -6,25 +6,41 @@
       "systems": {
         "scratch": {
           "name": "Parex Scratch Render System",
-          "description": "Traditional 1-coat system for maximum durability",
+          "description": "Traditional 3-coat system for maximum durability",
           "components": {
+            "basecoat": {
+              "name": "Parex DPM BaseCoat 25kg",
+              "shopify_handle": "parex-dpm-basecoat-25kg",
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901234",
+              "price": 45.0,
+              "coverage_per_unit": 14,
+              "unit": "m²"
+            },
             "mesh": {
               "name": "Parex Reinforcement Mesh 50m",
-              "shopify_handle": "parex-tv10-reinforcing-mesh-50mtr-x-1mtr",
-              "price": 79.90,
+              "shopify_handle": "parex-reinforcement-mesh-50m",
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901235",
+              "price": 28.0,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
             "topcoat": {
               "name": "Parex Monorex GM TopCoat 25kg",
-              "shopify_handle": "parex-monorex-gm-scraped-textured-render",
-              "price": 11.40,
-              "coverage_per_unit": 1,
-              "unit": "m²"
+              "shopify_handle": "parex-monorex-gm-topcoat-25kg",
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901236",
+              "price": 52.0,
+              "coverage_per_unit": 22,
+              "unit": "m²",
+              "has_color_variants": true
             }
           },
           "suitable_substrates": [
-            "concrete-block"
+            "concrete-block",
+            "clay-brick",
+            "solid-brick",
+            "cavity-brick",
+            "pebbledash",
+            "blown-render"
           ],
           "performance": {
             "durability": 9,
@@ -40,23 +56,27 @@
             "basecoat": {
               "name": "Parex DPM BaseCoat 25kg",
               "shopify_handle": "parex-dpm-basecoat-25kg",
-              "price": 45.00,
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901234",
+              "price": 45.0,
               "coverage_per_unit": 14,
               "unit": "m²"
             },
             "mesh": {
               "name": "Parex Reinforcement Mesh 50m",
               "shopify_handle": "parex-reinforcement-mesh-50m",
-              "price": 28.00,
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901235",
+              "price": 28.0,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
             "topcoat": {
               "name": "Parex Monorex TC TopCoat 25kg",
               "shopify_handle": "parex-monorex-tc-topcoat-25kg",
-              "price": 48.00,
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901237",
+              "price": 48.0,
               "coverage_per_unit": 18,
-              "unit": "m²"
+              "unit": "m²",
+              "has_color_variants": true
             }
           },
           "suitable_substrates": [
@@ -90,33 +110,42 @@
             "basecoat": {
               "name": "EcoRend BaseCoat 25kg",
               "shopify_handle": "ecoRend-basecoat-25kg",
-              "price": 42.00,
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901238",
+              "price": 42.0,
               "coverage_per_unit": 15,
               "unit": "m²"
             },
             "mesh": {
               "name": "EcoRend Reinforcement Mesh 50m",
               "shopify_handle": "ecoRend-reinforcement-mesh-50m",
-              "price": 26.00,
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901239",
+              "price": 26.0,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
             "topcoat": {
               "name": "EcoRend TopCoat 25kg",
               "shopify_handle": "ecoRend-topcoat-25kg",
-              "price": 48.00,
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901240",
+              "price": 48.0,
               "coverage_per_unit": 20,
-              "unit": "m²"
+              "unit": "m²",
+              "has_color_variants": true
             }
           },
           "suitable_substrates": [
-            "concrete-block"
+            "stone-masonry",
+            "concrete-block-existing",
+            "painted-masonry",
+            "tyrolean",
+            "textured-render",
+            "cracked-render"
           ],
           "performance": {
             "durability": 8,
             "ease_of_application": 8,
             "cost_effectiveness": 9,
-            "weather_resistance": 7
+            "weather_resistance": 8
           }
         },
         "thincoat": {
@@ -124,36 +153,40 @@
           "description": "Natural thin coat system for modern applications",
           "components": {
             "basecoat": {
-              "name": "EcoRend BaseCoat X32",
-              "shopify_handle": "ecorend-x32-one-coat-base",
-              "price": 42.00,
-              "coverage_per_unit": 1.3369,
+              "name": "EcoRend BaseCoat 25kg",
+              "shopify_handle": "ecoRend-basecoat-25kg",
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901238",
+              "price": 42.0,
+              "coverage_per_unit": 15,
               "unit": "m²"
             },
             "mesh": {
               "name": "EcoRend Reinforcement Mesh 50m",
-              "shopify_handle": "ecorend-standard-mesh-50-mtrs",
-              "price": 26.00,
+              "shopify_handle": "ecoRend-reinforcement-mesh-50m",
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901239",
+              "price": 26.0,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
-            "primer": {
-              "name": "EcoRend SP Primer",
-              "shopify_handle": "ecorend-sp15-silicone-primer-25kg",
-              "price": 44.00,
-              "coverage_per_unit": 16,
-              "unit": "m²"
-            },
             "topcoat": {
-              "name": "EcoRend SR15 Silicone TopCoat",
-              "shopify_handle": "ecorend-sr15-silicone-thin-coat-render-1-5mm-25kg",
-              "price": 44.00,
-              "coverage_per_unit": 9,
-              "unit": "m²"
+              "name": "EcoRend TC TopCoat 25kg",
+              "shopify_handle": "ecoRend-tc-topcoat-25kg",
+              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901241",
+              "price": 44.0,
+              "coverage_per_unit": 16,
+              "unit": "m²",
+              "has_color_variants": true
             }
           },
           "suitable_substrates": [
-            "concrete-block"
+            "steel-frame",
+            "timber-frame",
+            "mineral-wool",
+            "phenolic-insulation",
+            "wood-fiber",
+            "cork-insulation",
+            "tile-hung",
+            "weatherboard"
           ],
           "performance": {
             "durability": 7,
@@ -349,50 +382,62 @@
   "beading": {
     "scratch_render": [
       {
-        "id": "9457527947607/variants/48838027608407",
+        "id": "sas-angle-15mm",
         "name": "SAS Angle Bead 15mm",
         "description": "Recommended for external corners",
-        "price": 3.50,
-        "length": 3,
+        "shopify_handle": "sas-angle-bead-15mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901242",
+        "price": 3.5,
+        "length": 2.5,
         "recommended": true
       },
       {
-        "id": "9457527947607/variants/48838027542871",
+        "id": "sas-angle-10mm",
         "name": "SAS Angle Bead 10mm",
         "description": "Alternative for external corners",
-        "price": 3.20,
-        "length": 3,
+        "shopify_handle": "sas-angle-bead-10mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901243",
+        "price": 3.2,
+        "length": 2.5,
         "recommended": false
       },
       {
-        "id": "9457527718231/variants/48838025773399",
+        "id": "sas-stop-15mm",
         "name": "SAS Stop Bead 15mm",
         "description": "Recommended for render termination",
-        "price": 3.80,
-        "length": 3,
+        "shopify_handle": "sas-stop-bead-15mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901244",
+        "price": 3.8,
+        "length": 2.5,
         "recommended": true
       },
       {
-        "id": "9457527718231/variants/48838025707863",
+        "id": "sas-stop-10mm",
         "name": "SAS Stop Bead 10mm",
         "description": "Alternative for render termination",
-        "price": 3.50,
-        "length": 3,
+        "shopify_handle": "sas-stop-bead-10mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901245",
+        "price": 3.5,
+        "length": 2.5,
         "recommended": false
       },
       {
         "id": "sas-bellcast",
         "name": "SAS Bellcast Bead",
         "description": "For water shedding applications",
-        "price": 4.20,
-        "length": 3,
+        "shopify_handle": "sas-bellcast-bead",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901246",
+        "price": 4.2,
+        "length": 2.5,
         "recommended": false
       },
       {
         "id": "sas-movement",
         "name": "SAS Movement Bead",
         "description": "For expansion joints",
-        "price": 4.50,
+        "shopify_handle": "sas-movement-bead",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901247",
+        "price": 4.5,
         "length": 2.5,
         "recommended": false
       }
@@ -402,7 +447,9 @@
         "id": "corner-mesh-premium",
         "name": "Corner Mesh Bead Premium",
         "description": "Premium option with integrated mesh",
-        "price": 4.80,
+        "shopify_handle": "corner-mesh-bead-premium",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901248",
+        "price": 4.8,
         "length": 2.5,
         "recommended": true
       },
@@ -410,7 +457,9 @@
         "id": "corner-mesh-6mm",
         "name": "6mm Corner Mesh Bead",
         "description": "Standard corner protection",
-        "price": 4.20,
+        "shopify_handle": "corner-mesh-bead-6mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901249",
+        "price": 4.2,
         "length": 2.5,
         "recommended": false
       },
@@ -418,7 +467,9 @@
         "id": "stop-mesh",
         "name": "Stop Mesh Bead",
         "description": "For render termination with mesh",
-        "price": 4.50,
+        "shopify_handle": "stop-mesh-bead",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901250",
+        "price": 4.5,
         "length": 2.5,
         "recommended": false
       },
@@ -426,7 +477,9 @@
         "id": "clip-drip-ledge",
         "name": "Clip-on Drip Ledge Bead",
         "description": "For window sills and ledges",
-        "price": 5.20,
+        "shopify_handle": "clip-drip-ledge-bead",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901251",
+        "price": 5.2,
         "length": 2.5,
         "recommended": false
       }
@@ -437,21 +490,27 @@
       {
         "id": "masking-tape",
         "name": "Professional Masking Tape 50m",
-        "price": 12.00,
+        "shopify_handle": "professional-masking-tape-50m",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901252",
+        "price": 12.0,
         "bundle_discount": 0.15,
-        "attachment_rate": 0.80
+        "attachment_rate": 0.8
       },
       {
         "id": "plastic-sheeting",
         "name": "Heavy Duty Plastic Sheeting 25m",
-        "price": 18.00,
-        "bundle_discount": 0.10,
+        "shopify_handle": "heavy-duty-plastic-sheeting-25m",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901253",
+        "price": 18.0,
+        "bundle_discount": 0.1,
         "attachment_rate": 0.65
       },
       {
         "id": "corner-protection",
         "name": "Corner Protection Tape 25m",
-        "price": 9.50,
+        "shopify_handle": "corner-protection-tape-25m",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901254",
+        "price": 9.5,
         "bundle_discount": 0.12,
         "attachment_rate": 0.45
       }
@@ -460,15 +519,19 @@
       {
         "id": "render-float",
         "name": "Professional Render Float",
-        "price": 24.00,
-        "bundle_discount": 0.20,
+        "shopify_handle": "professional-render-float",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901255",
+        "price": 24.0,
+        "bundle_discount": 0.2,
         "attachment_rate": 0.45,
         "system_specific": ["scratch", "thin_coat"]
       },
       {
         "id": "mixing-paddle",
         "name": "Mixing Paddle 120mm",
-        "price": 32.00,
+        "shopify_handle": "mixing-paddle-120mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901256",
+        "price": 32.0,
         "bundle_discount": 0.15,
         "attachment_rate": 0.35,
         "system_specific": ["scratch", "thin_coat"]
@@ -476,17 +539,21 @@
       {
         "id": "hawk-board",
         "name": "Hawk Board 300mm",
-        "price": 18.00,
+        "shopify_handle": "hawk-board-300mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901257",
+        "price": 18.0,
         "bundle_discount": 0.18,
-        "attachment_rate": 0.40,
+        "attachment_rate": 0.4,
         "system_specific": ["scratch"]
       },
       {
         "id": "mixing-bucket",
         "name": "Graduated Mixing Bucket 25L",
-        "price": 15.00,
-        "bundle_discount": 0.10,
-        "attachment_rate": 0.30,
+        "shopify_handle": "graduated-mixing-bucket-25l",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901258",
+        "price": 15.0,
+        "bundle_discount": 0.1,
+        "attachment_rate": 0.3,
         "system_specific": ["scratch", "thin_coat"]
       }
     ],
@@ -494,15 +561,19 @@
       {
         "id": "universal-primer",
         "name": "Universal Primer 5L",
-        "price": 28.00,
+        "shopify_handle": "universal-primer-5l",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901259",
+        "price": 28.0,
         "bundle_discount": 0.12,
-        "attachment_rate": 0.30,
+        "attachment_rate": 0.3,
         "system_specific": ["scratch"]
       },
       {
         "id": "bonding-agent",
         "name": "Bonding Agent 1L",
-        "price": 16.00,
+        "shopify_handle": "bonding-agent-1l",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901260",
+        "price": 16.0,
         "bundle_discount": 0.15,
         "attachment_rate": 0.25,
         "system_specific": ["scratch"]
@@ -512,17 +583,21 @@
       {
         "id": "texture-roller",
         "name": "Texture Roller 18mm",
-        "price": 22.00,
-        "bundle_discount": 0.20,
+        "shopify_handle": "texture-roller-18mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901261",
+        "price": 22.0,
+        "bundle_discount": 0.2,
         "attachment_rate": 0.25,
         "system_specific": ["thin_coat"]
       },
       {
         "id": "edge-trowel",
         "name": "Edge Trowel 100mm",
-        "price": 19.00,
+        "shopify_handle": "edge-trowel-100mm",
+        "shopify_variant_id": "gid://shopify/ProductVariant/12345678901262",
+        "price": 19.0,
         "bundle_discount": 0.15,
-        "attachment_rate": 0.20,
+        "attachment_rate": 0.2,
         "system_specific": ["scratch", "thin_coat"]
       }
     ]

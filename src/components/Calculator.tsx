@@ -34,19 +34,25 @@ export default function Calculator() {
 
   // Fetch Shopify prices
   const fetchShopifyPrices = async (handles: string[]) => {
-    // This would connect to your Shopify API
-    // For now, we'll use the JSON prices as fallback
-    const prices: Record<string, any> = {}
+    try {
+      const response = await fetch("/api/shopify/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ handles }),
+      })
 
-    // Simulate API call - replace with actual Shopify integration
-    handles.forEach((handle) => {
-      prices[handle] = {
-        price: null, // Will use JSON price as fallback
-        variants: [],
+      if (!response.ok) {
+        throw new Error("Failed to fetch Shopify prices")
       }
-    })
 
-    setShopifyPrices(prices)
+      const data = await response.json()
+      setShopifyPrices(data.products)
+    } catch (error) {
+      console.error("Error fetching Shopify prices:", error)
+      // Fallback to JSON prices - already handled in getPrice function
+    }
   }
 
   const getPrice = (handle: string, variantId?: string) => {
@@ -191,18 +197,38 @@ export default function Calculator() {
   }
 
   const fetchColorVariants = async (handle: string) => {
-    // This would fetch from Shopify API
-    // For now, simulate with default colors
-    const defaultColors = [
-      { id: "white", name: "Pure White", hex: "#FFFFFF", price_adjustment: 0 },
-      { id: "cream", name: "Cream", hex: "#F5F5DC", price_adjustment: 0 },
-      { id: "light-grey", name: "Light Grey", hex: "#D3D3D3", price_adjustment: 0 },
-      { id: "dark-grey", name: "Dark Grey", hex: "#696969", price_adjustment: 5 },
-      { id: "beige", name: "Beige", hex: "#F5F5DC", price_adjustment: 0 },
-      { id: "sandstone", name: "Sandstone", hex: "#FAD5A5", price_adjustment: 3 },
-    ]
+    try {
+      const response = await fetch(`/api/shopify/variants/${handle}`)
 
-    setColorVariants(defaultColors)
+      if (!response.ok) {
+        throw new Error("Failed to fetch color variants")
+      }
+
+      const data = await response.json()
+
+      // Transform Shopify variants into color options
+      const colors = data.colorVariants.map((variant: any) => ({
+        id: variant.id,
+        name: variant.name,
+        hex: variant.hex,
+        price_adjustment: variant.price - data.colorVariants[0].price, // Calculate difference from base price
+        availableForSale: variant.availableForSale,
+      }))
+
+      setColorVariants(colors)
+    } catch (error) {
+      console.error("Error fetching color variants:", error)
+      // Fallback to default colors
+      const defaultColors = [
+        { id: "white", name: "Pure White", hex: "#FFFFFF", price_adjustment: 0 },
+        { id: "cream", name: "Cream", hex: "#F5F5DC", price_adjustment: 0 },
+        { id: "light-grey", name: "Light Grey", hex: "#D3D3D3", price_adjustment: 0 },
+        { id: "dark-grey", name: "Dark Grey", hex: "#696969", price_adjustment: 5 },
+        { id: "beige", name: "Beige", hex: "#F5F5DC", price_adjustment: 0 },
+        { id: "sandstone", name: "Sandstone", hex: "#FAD5A5", price_adjustment: 3 },
+      ]
+      setColorVariants(defaultColors)
+    }
   }
 
   const getBeadingOptions = () => {
@@ -303,7 +329,36 @@ export default function Calculator() {
     return total
   }
 
-  const addToCart = () => {
+  // Add this new function for adding to Shopify cart
+  const addToShopifyCart = async (cartItems: any[]) => {
+    try {
+      const response = await fetch("/api/shopify/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: cartItems }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to add to Shopify cart")
+      }
+
+      const data = await response.json()
+
+      // Redirect to Shopify checkout
+      if (data.cart.checkoutUrl) {
+        window.open(data.cart.checkoutUrl, "_blank")
+      }
+
+      return data.cart
+    } catch (error) {
+      console.error("Error adding to Shopify cart:", error)
+      throw error
+    }
+  }
+
+  const addToCart = async () => {
     const cartItem = {
       id: Date.now(),
       selectedSystem: selections.selectedSystem,
@@ -316,7 +371,43 @@ export default function Calculator() {
       substrate: selections.substrate,
     }
 
+    // Add to local cart
     setCart([...cart, cartItem])
+
+    // Prepare items for Shopify cart
+    const shopifyItems: any[] = []
+
+    // Add system components
+    selections.selectedSystem?.components.forEach((component: any) => {
+      shopifyItems.push({
+        variantId: component.shopify_variant_id || component.shopify_handle, // You'll need to store variant IDs
+        quantity: component.quantity,
+      })
+    })
+
+    // Add beading items
+    selections.beading.forEach((bead) => {
+      shopifyItems.push({
+        variantId: bead.shopify_variant_id || bead.shopify_handle,
+        quantity: bead.quantity,
+      })
+    })
+
+    // Add accessories
+    selections.accessories.forEach((accessory) => {
+      shopifyItems.push({
+        variantId: accessory.shopify_variant_id || accessory.shopify_handle,
+        quantity: 1,
+      })
+    })
+
+    // Add to Shopify cart
+    try {
+      await addToShopifyCart(shopifyItems)
+      alert("Items added to cart successfully!")
+    } catch (error) {
+      alert("Error adding items to cart. Please try again.")
+    }
 
     // Reset for new calculation
     setSelections({

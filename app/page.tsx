@@ -1,7 +1,7 @@
 "use client"
 
-import  from "../src/components/ui/card"
+import Calculator from "@/components/Calculator"
 
-export default function SyntheticV0PageForDeployment() {
-  return < />
+export default function Home() {
+  return <Calculator />
 }

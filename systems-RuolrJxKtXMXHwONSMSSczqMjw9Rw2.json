@@ -8,31 +8,33 @@
           "name": "Parex Scratch Render System",
           "description": "Traditional 3-coat system for maximum durability",
           "components": {
-            "mesh": {
-              "name": "Parex Reinforcement Mesh 50m",
-              "shopify_handle": "parex-tv10-reinforcing-mesh-50mtr-x-1mtr",
-              "shopify_variant_id": "gid://shopify/ProductVariant/9585320690007",
-              "price": 79.9,
-              "coverage_per_unit": 50,
-              "unit": "m²"
+              "mesh": {
+                "name": "Parex Reinforcement Mesh 50m",
+                "shopify_handle": "parex-tv10-reinforcing-mesh-50mtr-x-1mtr",
+                "shopify_variant_id": "gid://shopify/ProductVariant/9585320690007",
+                "price": 79.90,
+                "coverage_per_unit": 50,
+                "unit": "m²"
+              },
+              "topcoat": {
+                "name": "Parex Monorex GM TopCoat 25kg",
+                "shopify_handle": "parex-monorex-gm-scraped-textured-render",
+                "shopify_variant_id": "gid://shopify/ProductVariant/9457546592599",
+                "price": 11.40,
+                "coverage_per_unit": 1,
+                "unit": "m²",
+                "has_color_variants": true
+              }
             },
-            "topcoat": {
-              "name": "Parex Monorex GM TopCoat 25kg",
-              "shopify_handle": "parex-monorex-gm-scraped-textured-render",
-              "shopify_variant_id": "gid://shopify/ProductVariant/9457546592599",
-              "price": 11.4,
-              "coverage_per_unit": 1,
-              "unit": "m²",
-              "has_color_variants": true
+            "suitable_substrates": [
+              "concrete-block"
+            ],
+            "performance": {
+              "durability": 9,
+              "ease_of_application": 7,
+              "cost_effectiveness": 8,
+              "weather_resistance": 9
             }
-          },
-          "suitable_substrates": ["concrete-block"],
-          "performance": {
-            "durability": 9,
-            "ease_of_application": 7,
-            "cost_effectiveness": 8,
-            "weather_resistance": 9
-          }
         },
         "thincoat": {
           "name": "Parex Thin Coat System",

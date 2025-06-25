@@ -8,37 +8,25 @@
           "name": "Parex Scratch Render System",
           "description": "Traditional 3-coat system for maximum durability",
           "components": {
-            "basecoat": {
-              "name": "Parex DPM BaseCoat 25kg",
-              "shopify_handle": "parex-dpm-basecoat-25kg",
-              "price": 45.0,
-              "coverage_per_unit": 14,
-              "unit": "m²"
-            },
             "mesh": {
               "name": "Parex Reinforcement Mesh 50m",
-              "shopify_handle": "parex-reinforcement-mesh-50m",
-              "price": 28.0,
+              "shopify_handle": "parex-tv10-reinforcing-mesh-50mtr-x-1mtr",
+              "shopify_variant_id": "gid://shopify/ProductVariant/9585320690007",
+              "price": 79.9,
               "coverage_per_unit": 50,
               "unit": "m²"
             },
             "topcoat": {
               "name": "Parex Monorex GM TopCoat 25kg",
-              "shopify_handle": "parex-monorex-gm-topcoat-25kg",
-              "price": 52.0,
-              "coverage_per_unit": 22,
+              "shopify_handle": "parex-monorex-gm-scraped-textured-render",
+              "shopify_variant_id": "gid://shopify/ProductVariant/9457546592599",
+              "price": 11.4,
+              "coverage_per_unit": 1,
               "unit": "m²",
               "has_color_variants": true
             }
           },
-          "suitable_substrates": [
-            "concrete-block",
-            "clay-brick",
-            "solid-brick",
-            "cavity-brick",
-            "pebbledash",
-            "blown-render"
-          ],
+          "suitable_substrates": ["concrete-block"],
           "performance": {
             "durability": 9,
             "ease_of_application": 7,
@@ -150,9 +138,9 @@
           "description": "Natural thin coat system for modern applications",
           "components": {
             "basecoat": {
-              "name": "EcoRend BaseCoat 25kg",
-              "shopify_handle": "ecoRend-basecoat-25kg",
-              "shopify_variant_id": "gid://shopify/ProductVariant/12345678901238",
+              "name": "EcoRend X32 BaseCoat",
+              "shopify_handle": "ecorend-x32-one-coat-base",
+              "shopify_variant_id": "gid://shopify/ProductVariant/9457507598679",
               "price": 42.0,
               "coverage_per_unit": 15,
               "unit": "m²"
